@@ -1,6 +1,6 @@
 -- ============================================================================
 -- ONE-TIME UPGRADE — run this whole file in the Supabase dashboard SQL editor
--- (project kasvrgqbmydypwvkqzju → SQL Editor → New query → paste → Run).
+-- (project vwziwqqscpaqvudxdafw → SQL Editor → New query → paste → Run).
 --
 -- BEFORE running, also do these two things in the dashboard:
 --   1. Authentication → Users → Add user → Create new user:
@@ -69,9 +69,9 @@ create policy "family read relationships"
 create policy "family insert relationships"
   on public.family_relationships for insert
   to authenticated with check (public.is_family_account());
-create policy "family update relationships"
+create policy "owner update relationships"
   on public.family_relationships for update
-  to authenticated using (public.is_family_account()) with check (public.is_family_account());
+  to authenticated using (public.is_owner_account()) with check (public.is_owner_account());
 create policy "owner delete relationships"
   on public.family_relationships for delete
   to authenticated using (public.is_owner_account());

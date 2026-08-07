@@ -4,12 +4,12 @@
  * Two passwords unlock editing (the actual passwords are written down in the
  * local `password/` folder, which is git-ignored and never deployed — only
  * these one-way hashes ship with the site):
- *  - OWNER: can add, edit AND delete people, change relationships, reset the
- *    data and replace it via import.
- *  - EDITOR (member password): can add people and fill in MISSING info on
- *    existing people. Cannot delete, cannot overwrite existing details,
- *    cannot change relationships, cannot replace or reset the data. Share
- *    this one with family members who help maintain the tree.
+ *  - OWNER: can add, edit AND delete people, change relationships, manage
+ *    privacy / data / backups / join requests / change log, reset or import.
+ *  - EDITOR (member password): can add people and edit detail fields (names,
+ *    dates, place, bio, photo, etc.). Cannot delete, cannot change
+ *    relationships (parents/spouses/divorce), cannot open owner Settings
+ *    sections, cannot replace or reset the data. Share this one with family.
  *
  * CHANGE THE PASSWORDS before sharing your site. Generate a new hash on the
  * Settings page ("Access" section), paste it here, update password/passwords.txt,

@@ -513,7 +513,7 @@ export const en = {
   'unlock.btn': 'Unlock',
   'unlock.ownerToast': 'Unlocked as owner — full access, including delete.',
   'unlock.editorToast':
-    'Unlocked as family editor — you can add people and fill in missing info, but not delete or change existing details.',
+    'Unlocked as family editor — you can add people and edit details, but not delete or change relationships.',
 
   // Members page
   'members.title': 'Family members',
@@ -574,7 +574,7 @@ export const en = {
     'Family sites deserve care. The Settings page has a public privacy mode that hides exact dates, cities, occupations, biographies, photos and the ages of minors. We deliberately store no addresses, phone numbers, email addresses or documents. If you are in this tree and want something changed or removed, tell the family administrator and it will be done.',
   'about.contributeTitle': 'How to contribute updates',
   'about.contributeText1':
-    'Family members with the family password can unlock edit mode on the Family Tree page to add new people (a new baby, a new spouse) and fill in missing details. Deleting people is reserved for the owner.',
+    'Family members with the family password can unlock edit mode on the Family Tree page to add new people (a new baby, a new spouse) and edit details. Deleting people and changing relationships is reserved for the owner.',
   'about.contributeText2':
     'Because this site has no server, your edits are saved in your own browser. To share them with everyone: make your changes, use Export to download the family JSON file, and send it to the owner — they import it and republish the site so everyone sees the update.',
 
@@ -613,7 +613,10 @@ export const en = {
   'settings.hidePhotosDesc': 'Initials avatars are shown instead.',
   'settings.accessTitle': 'Editing access',
   'settings.accessIntro':
-    'Two passwords protect editing: the owner password (add, edit and delete) and the family editor password (add and fill in missing info only — safe to share with relatives who help maintain the tree).',
+    'Two passwords protect editing: the owner password (full access, including Settings admin tools) and the family editor password (add people and edit details — safe to share with relatives who help maintain the tree).',
+  'settings.accountTitle': 'Your account',
+  'settings.accountIntro':
+    'You are signed in as a family editor. You can add people and edit details on the tree. Admin settings (privacy, data, backups, join requests) are owner-only.',
   'settings.currentRole': 'Current role: {role}',
   'settings.roleOwner': 'Owner',
   'settings.roleEditor': 'Family editor',
@@ -1269,7 +1272,7 @@ export const uz: Record<TKey, string> = {
   'unlock.btn': 'Ochish',
   'unlock.ownerToast': "Egasi sifatida ochildi — to'liq huquq, o'chirish ham mumkin.",
   'unlock.editorToast':
-    "Oila tahrirchisi sifatida ochildi — odam qo'shishingiz va bo'sh ma'lumotlarni to'ldirishingiz mumkin, lekin o'chira olmaysiz.",
+    "Oila tahrirchisi sifatida ochildi — odam qo'shishingiz va ma'lumotlarni tahrirlashingiz mumkin, lekin o'chira olmaysiz va qarindoshlik aloqalarini o'zgartira olmaysiz.",
 
   'members.title': "Oila a'zolari",
   'members.shown': '{total} kishidan {shown} tasi ko‘rsatilmoqda',
@@ -1327,7 +1330,7 @@ export const uz: Record<TKey, string> = {
     "Oilaviy saytlarga ehtiyotkorlik kerak. Sozlamalar sahifasida aniq sanalar, shaharlar, kasblar, tarjimai hollar, rasmlar va voyaga yetmaganlar yoshini yashiradigan maxfiylik rejimi bor. Manzillar, telefon raqamlari, elektron pochta va hujjatlarni ataylab saqlamaymiz. Agar siz shu shajarada bo'lsangiz va biror narsani o'zgartirish yoki o'chirishni istasangiz, oila administratoriga ayting — bajariladi.",
   'about.contributeTitle': "Yangiliklarni qanday qo'shish mumkin",
   'about.contributeText1':
-    "Oila paroliga ega a'zolar Shajara sahifasida tahrirlash rejimini ochib, yangi odamlarni (yangi chaqaloq, yangi kelin-kuyov) qo'shishlari va bo'sh ma'lumotlarni to'ldirishlari mumkin. O'chirish faqat egasiga tegishli.",
+    "Oila paroliga ega a'zolar Shajara sahifasida tahrirlash rejimini ochib, yangi odamlarni (yangi chaqaloq, yangi kelin-kuyov) qo'shishlari va ma'lumotlarni tahrirlashlari mumkin. O'chirish va aloqalarni o'zgartirish faqat egasiga tegishli.",
   'about.contributeText2':
     "Saytda server yo'q, shuning uchun o'zgarishlaringiz o'z brauzeringizda saqlanadi. Hamma ko'rishi uchun: o'zgarishlarni kiriting, «Eksport» bilan JSON faylni yuklab oling va egasiga yuboring — u import qilib saytni qayta e'lon qiladi.",
 
@@ -1365,7 +1368,10 @@ export const uz: Record<TKey, string> = {
   'settings.hidePhotosDesc': "O'rniga bosh harfli avatarlar ko'rsatiladi.",
   'settings.accessTitle': 'Tahrirlash huquqi',
   'settings.accessIntro':
-    "Tahrirlashni ikkita parol himoya qiladi: egasining paroli (qo'shish, tahrirlash va o'chirish) va oila tahrirchisi paroli (faqat qo'shish va bo'sh joylarni to'ldirish — shajarani yuritishga yordam beradigan qarindoshlarga berish mumkin).",
+    "Tahrirlashni ikkita parol himoya qiladi: egasining paroli (to'liq huquq, Sozlamalar admin vositalari bilan) va oila tahrirchisi paroli (odam qo'shish va ma'lumotlarni tahrirlash — qarindoshlarga berish mumkin).",
+  'settings.accountTitle': 'Hisobingiz',
+  'settings.accountIntro':
+    "Siz oila tahrirchisi sifatida kirdingiz. Shajarada odam qo'shishingiz va ma'lumotlarni tahrirlashingiz mumkin. Admin sozlamalari (maxfiylik, ma'lumotlar, zaxira, so'rovlar) faqat egasiga tegishli.",
   'settings.currentRole': 'Joriy rol: {role}',
   'settings.roleOwner': 'Egasi',
   'settings.roleEditor': 'Oila tahrirchisi',

@@ -1,50 +1,27 @@
-name: Keep database awake + backup
+name: Keep database awake
 
-# Twice a week: ping Shajira's Supabase so the free project stays awake, and
-# commit a JSON snapshot under backups/ as a safety copy.
+# Twice a week: ping Shajira's Supabase so the free project stays awake.
+# Real backups live in the app (Settings → Automatic backups) for the owner;
+# anon RLS returns empty rows, so we do not commit fake empty JSON snapshots.
 on:
   schedule:
     - cron: '0 3 * * 1,4' # Mondays and Thursdays 03:00 UTC
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   keepalive:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Download family data (keeps Supabase active)
+      - name: Ping Supabase (keeps project active)
         env:
           # Public anon key — same one that ships in the website (RLS protects data).
           SUPABASE_URL: 'https://vwziwqqscpaqvudxdafw.supabase.co'
           SUPABASE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3eml3cXFzY3BhcXZ1ZHhkYWZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxMzE4NDksImV4cCI6MjEwMTcwNzg0OX0.kXFq5zIjMcdy7LuCjxEg8-8sYfHcKRDGv8IbeOe5L_8'
         run: |
-          mkdir -p backups
-          # Prefer a signed-in request if SERVICE credentials are not available;
-          # with RLS lockdown, anon may get []. The ping still counts as activity.
           curl -sf "$SUPABASE_URL/rest/v1/family_members?select=id&limit=1" \
             -H "apikey: $SUPABASE_KEY" \
             -H "Authorization: Bearer $SUPABASE_KEY" \
             -o /tmp/ping.json || true
-          curl -sf "$SUPABASE_URL/rest/v1/family_members?select=*&order=id" \
-            -H "apikey: $SUPABASE_KEY" \
-            -H "Authorization: Bearer $SUPABASE_KEY" \
-            | python3 -m json.tool > backups/family_members.json || echo '[]' > backups/family_members.json
-          curl -sf "$SUPABASE_URL/rest/v1/family_relationships?select=*&order=key" \
-            -H "apikey: $SUPABASE_KEY" \
-            -H "Authorization: Bearer $SUPABASE_KEY" \
-            | python3 -m json.tool > backups/family_relationships.json || echo '[]' > backups/family_relationships.json
-          date -u +"%Y-%m-%d %H:%M UTC" > backups/last-check.txt
-
-      - name: Commit the backup
-        run: |
-          git config user.name "Kadir Ravshanov"
-          git config user.email "m.qodir99@gmail.com"
-          git add backups
-          git diff --cached --quiet && echo "Nothing new" || {
-            git commit -m "Automatic data backup"
-            git push
-          }
+          echo "Pinged at $(date -u +"%Y-%m-%d %H:%M UTC")"
+          head -c 200 /tmp/ping.json || true
+          echo

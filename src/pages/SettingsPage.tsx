@@ -564,7 +564,27 @@ export function SettingsPage() {
         </div>
       </section>
 
-      {hideAdvanced && (
+      {/* Family editors: always show account (role + sign out). Owner admin
+          tools stay behind Easy Mode / Show advanced. */}
+      {!canDelete && (
+        <section className="card mt-4 p-6">
+          <h2 className="flex items-center gap-2 font-semibold">
+            <KeyRound className="h-5 w-5 text-brand-600" aria-hidden /> {t('settings.accountTitle')}
+          </h2>
+          <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">{t('settings.accountIntro')}</p>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="badge border-sky-300 bg-sky-50 text-sky-800 dark:border-sky-800 dark:bg-sky-950/60 dark:text-sky-300">
+              <Eye className="h-3 w-3" aria-hidden />
+              {t('settings.currentRole', { role: roleLabel })}
+            </span>
+            <button type="button" className="btn-secondary" onClick={signOut}>
+              <LogOut className="h-4 w-4" aria-hidden /> {t('settings.signOut')}
+            </button>
+          </div>
+        </section>
+      )}
+
+      {hideAdvanced && canDelete && (
         <button
           type="button"
           className="btn-secondary mt-4 w-full"
@@ -574,10 +594,9 @@ export function SettingsPage() {
         </button>
       )}
 
-      {!hideAdvanced && (
+      {/* Owner-only admin sections */}
+      {canDelete && !hideAdvanced && (
         <>
-      {/* Privacy — owner-only: controls what the whole family's data hides publicly. */}
-      {canDelete && (
       <section className="card mt-4 p-6">
         <h2 className="flex items-center gap-2 font-semibold">
           <ShieldCheck className="h-5 w-5 text-brand-600" aria-hidden />{' '}
@@ -640,9 +659,7 @@ export function SettingsPage() {
           />
         </div>
       </section>
-      )}
 
-      {/* Access */}
       <section className="card mt-4 p-6">
         <h2 className="flex items-center gap-2 font-semibold">
           <KeyRound className="h-5 w-5 text-brand-600" aria-hidden /> {t('settings.accessTitle')}
@@ -665,7 +682,6 @@ export function SettingsPage() {
             </button>
           )}
         </div>
-        {canDelete && (
         <details className="mt-4 rounded-xl bg-stone-50 p-3 text-sm dark:bg-stone-800/60">
           <summary className="cursor-pointer font-medium text-stone-700 dark:text-stone-300">
             {t('settings.howChange')}
@@ -703,11 +719,8 @@ export function SettingsPage() {
             <p className="text-xs">{t('settings.hashNote')}</p>
           </div>
         </details>
-        )}
       </section>
 
-      {/* Data management — owner-only: export/import/restore act on the whole dataset. */}
-      {canDelete && (
       <section className="card mt-4 p-6">
         <h2 className="flex items-center gap-2 font-semibold">
           <Database className="h-5 w-5 text-brand-600" aria-hidden /> {t('settings.dataTitle')}
@@ -717,47 +730,35 @@ export function SettingsPage() {
           <button type="button" className="btn-secondary" onClick={exportJson}>
             <Download className="h-4 w-4" aria-hidden /> {t('settings.exportBackup')}
           </button>
-          {canEdit && (
-            <>
-              <input
-                ref={importInputRef}
-                type="file"
-                accept="application/json,.json"
-                className="sr-only"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) void importFromFile(file);
-                  e.target.value = '';
-                }}
-              />
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={() => importInputRef.current?.click()}
-              >
-                <Upload className="h-4 w-4" aria-hidden /> {t('settings.importBackup')}
-              </button>
-            </>
-          )}
-          {canDelete && (
-            <button type="button" className="btn-danger" onClick={resetSample}>
-              <RotateCcw className="h-4 w-4" aria-hidden /> {t('settings.restore')}
-            </button>
-          )}
+          <input
+            ref={importInputRef}
+            type="file"
+            accept="application/json,.json"
+            className="sr-only"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) void importFromFile(file);
+              e.target.value = '';
+            }}
+          />
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => importInputRef.current?.click()}
+          >
+            <Upload className="h-4 w-4" aria-hidden /> {t('settings.importBackup')}
+          </button>
+          <button type="button" className="btn-danger" onClick={resetSample}>
+            <RotateCcw className="h-4 w-4" aria-hidden /> {t('settings.restore')}
+          </button>
         </div>
-        {!canEdit && <p className="mt-2 text-xs text-stone-400">{t('settings.unlockNote')}</p>}
       </section>
-      )}
-        </>
-      )}
 
-      {canDelete && <JoinRequestsCard />}
-      {canDelete && <ChangeLogCard />}
-      {!hideAdvanced && (
-        <>
-          {canDelete && <BackupsCard />}
-          {canDelete && <PhotosCard />}
-          {canDelete && <CountriesCard />}
+      <JoinRequestsCard />
+      <ChangeLogCard />
+      <BackupsCard />
+      <PhotosCard />
+      <CountriesCard />
         </>
       )}
 
