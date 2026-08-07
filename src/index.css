@@ -142,7 +142,17 @@ html:not(.dark) {
   --shajira-card: #d5dee8;
   --shajira-lift: #e2e9f1;
   --shajira-border: rgb(71 85 105 / 0.28);
+  /* Soft sage for tree person cards — light, not heavy */
+  --tree-card-bg: #eef4f0;
   color-scheme: light;
+}
+
+html.dark {
+  --tree-card-bg: #1c2622;
+}
+
+.tree-person-card {
+  background-color: var(--tree-card-bg);
 }
 
 html:not(.dark) body {
