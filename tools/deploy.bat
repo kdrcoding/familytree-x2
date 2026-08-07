@@ -22,9 +22,9 @@ if not exist node_modules (
 
 echo Where do you want to deploy?
 echo.
-echo   [1] Both - Vercel AND GitHub  (recommended, one click publishes everywhere)
-echo   [2] Vercel only
-echo   [3] GitHub only  (push - triggers the GitHub Pages workflow)
+echo   [1] Vercel via push to GitHub  (recommended)
+echo   [2] Vercel CLI only
+echo   [3] Push to GitHub only  (Vercel rebuilds from main)
 echo   [4] Build only  (creates the dist folder, deploy it yourself)
 echo.
 set "choice=1"
@@ -45,6 +45,7 @@ set "also_github="
 if "%choice%"=="4" goto :buildonly
 if "%choice%"=="3" goto :github
 if "%choice%"=="1" set "also_github=1"
+if "%choice%"=="1" goto :github
 
 :vercel
 echo Deploying to Vercel...
@@ -97,11 +98,9 @@ if errorlevel 1 (
     echo After that, double-click this script again.
     goto :end
 )
-rem Every commit is authored by the site owner - nothing else, ever.
-git config user.name "Kadir Ravshanov"
-git config user.email "m.qodir99@gmail.com"
+rem Prefer the known author without rewriting global git config.
 git add -A
-git commit -m "Update family tree" >nul 2>nul
+git -c user.name="Kadir Ravshanov" -c user.email="m.qodir99@gmail.com" commit -m "Update family tree" >nul 2>nul
 
 echo Pulling latest changes from GitHub...
 git pull origin main --rebase >nul 2>nul
@@ -116,12 +115,10 @@ if errorlevel 1 (
     goto :fail
 )
 echo.
-echo [DONE] Pushed to GitHub. The Pages workflow is building your site now -
-echo check the repository's Actions tab; the site updates in a minute or two.
+echo [DONE] Pushed to GitHub. Vercel rebuilds production from main.
 echo.
-echo Your permanent links (these NEVER change when you deploy):
+echo Your permanent link:
 echo     https://ravshanov-family.vercel.app
-echo     https://kdrcoding.github.io/familytree-x2/
 goto :end
 
 :buildonly
