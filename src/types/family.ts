@@ -83,9 +83,15 @@ export interface AppSettings {
   privacy: PrivacySettings;
   /**
    * Larger text, bigger taps, and a shorter menu — aimed at older relatives.
+   * Defaults off; auto-enabled when the signed-in name matches someone over 50.
    * Optional so older saved settings stay valid.
    */
   easyMode?: boolean;
+  /**
+   * True once the user toggles Easy Mode themselves — stops age-based auto
+   * enable from overriding their choice.
+   */
+  easyModeManual?: boolean;
 }
 
 export const DEFAULT_PRIVACY: PrivacySettings = {

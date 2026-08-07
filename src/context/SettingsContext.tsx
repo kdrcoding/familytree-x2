@@ -11,7 +11,10 @@ interface SettingsContextValue {
   toggleTheme: () => void;
   setLanguage: (language: AppLanguage) => void;
   setPrivacy: (patch: Partial<PrivacySettings>) => void;
+  /** User toggle from Settings — remembered as a manual choice. */
   setEasyMode: (easyMode: boolean) => void;
+  /** Age-based suggestion; ignored after the user has toggled Easy Mode. */
+  suggestEasyMode: (easyMode: boolean) => void;
 }
 
 const SettingsContext = createContext<SettingsContextValue | null>(null);
@@ -29,7 +32,7 @@ function isSettings(value: unknown): value is AppSettings {
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = usePersistentState<AppSettings>(
     STORAGE_KEYS.settings,
-    { theme: 'dark', language: 'ru', privacy: DEFAULT_PRIVACY, easyMode: true },
+    { theme: 'dark', language: 'ru', privacy: DEFAULT_PRIVACY, easyMode: false },
     isSettings,
   );
 
@@ -69,7 +72,12 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       setLanguage: (nextLanguage) => setSettings((s) => ({ ...s, language: nextLanguage })),
       setPrivacy: (patch) =>
         setSettings((s) => ({ ...s, privacy: { ...DEFAULT_PRIVACY, ...s.privacy, ...patch } })),
-      setEasyMode: (next) => setSettings((s) => ({ ...s, easyMode: next })),
+      setEasyMode: (next) => setSettings((s) => ({ ...s, easyMode: next, easyModeManual: true })),
+      suggestEasyMode: (next) =>
+        setSettings((s) => {
+          if (s.easyModeManual || Boolean(s.easyMode) === next) return s;
+          return { ...s, easyMode: next };
+        }),
     }),
     [settings, language, easyMode, setSettings],
   );

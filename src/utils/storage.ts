@@ -3,8 +3,8 @@
 // Keys use the `shajira.` prefix so this app never clashes with Oq-Ariq OILASI
 // on the same device.
 export const STORAGE_KEYS = {
-  // v2: Russian default language for Shajira (resets stale uz defaults).
-  settings: 'shajira.settings.v2',
+  // v3: Easy Mode defaults off (auto-on only when gate name matches age > 50).
+  settings: 'shajira.settings.v3',
   // v2: the tree now defaults to fully expanded (everyone shown). Bumping the
   // key drops the old auto-collapsed state so existing devices start expanded.
   collapsed: 'shajira.collapsed.v2',

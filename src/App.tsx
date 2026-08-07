@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AppLockGate } from './components/AppLockGate';
+import { EasyModeAgeSync } from './components/EasyModeAgeSync';
 import { Layout } from './components/Layout';
 import { AuthProvider } from './context/AuthContext';
 import { ConfirmProvider } from './context/ConfirmContext';
@@ -43,6 +44,7 @@ export default function App() {
                 after unlocking with the family or owner password. */}
             <AppLockGate>
               <FamilyProvider>
+                <EasyModeAgeSync />
                 <PhotoUrlsProvider>
                   <BrowserRouter basename={import.meta.env.BASE_URL}>
                   <Routes>

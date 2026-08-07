@@ -582,10 +582,10 @@ export const en = {
   'settings.title': 'Settings',
   'settings.easyTitle': 'Easy Mode',
   'settings.easyIntro':
-    'Larger text, bigger buttons, and a shorter menu — easier for older family members.',
+    'Larger text, bigger buttons, and a shorter menu — easier for older family members. Off by default; turns on automatically if your name in the tree is over 50.',
   'settings.easyLabel': 'Use Easy Mode',
   'settings.easyDesc':
-    'Hides Map, Statistics and About from the menu. Turn this on for parents and grandparents.',
+    'Hides Map, Statistics and About from the menu. Auto-on for relatives over 50 (matched from the name you enter at sign-in).',
   'settings.showAdvanced': 'Show advanced settings',
   'settings.domainTitle': 'Your own website address',
   'settings.domainIntro':
@@ -1337,10 +1337,10 @@ export const uz: Record<TKey, string> = {
   'settings.title': 'Sozlamalar',
   'settings.easyTitle': 'Oson rejim',
   'settings.easyIntro':
-    'Katta yozuv, katta tugmalar va qisqa menyu — keksa oila a’zolari uchun qulayroq.',
+    "Katta yozuv, katta tugmalar va qisqa menyu — keksa oila a’zolari uchun qulayroq. Odatiy holda o‘chiq; shajaradagi ismingiz 50 dan katta bo‘lsa avtomatik yonadi.",
   'settings.easyLabel': 'Oson rejimni yoqish',
   'settings.easyDesc':
-    'Menyudan Xarita, Statistika va Haqida yashiriladi. Ota-ona va buvi-bobolar uchun yoqing.',
+    'Menyudan Xarita, Statistika va Haqida yashiriladi. 50 dan katta qarindoshlar uchun (kirishdagi ism bo‘yicha) avtomatik yoqiladi.',
   'settings.showAdvanced': 'Qo‘shimcha sozlamalarni ko‘rsatish',
   'settings.domainTitle': 'O‘z sayt manzilingiz',
   'settings.domainIntro':
