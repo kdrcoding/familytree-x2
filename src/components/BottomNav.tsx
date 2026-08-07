@@ -19,7 +19,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-stone-200 bg-white/95 pb-[max(0.35rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden dark:border-stone-800 dark:bg-stone-950/95"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-stone-300/80 bg-[var(--shajira-panel,#e7e5e4)]/95 pb-[max(0.35rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden dark:border-stone-800 dark:bg-stone-950/95"
       aria-label={t('nav.bottomNav')}
     >
       <ul className="mx-auto grid max-w-lg grid-cols-4 gap-0.5 px-1.5 pt-0.5">

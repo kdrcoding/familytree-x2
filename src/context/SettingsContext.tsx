@@ -44,7 +44,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       meta.name = 'theme-color';
       document.head.appendChild(meta);
     }
-    meta.content = settings.theme === 'dark' ? '#082f49' : '#f0f9ff';
+    meta.content = settings.theme === 'dark' ? '#082f49' : '#b4c0ce';
   }, [settings.theme]);
 
   useEffect(() => {

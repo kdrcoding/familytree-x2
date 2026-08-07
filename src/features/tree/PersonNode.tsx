@@ -54,7 +54,7 @@ function PersonNodeComponent({ data }: NodeProps<PersonFlowNode>) {
         onClick={() => onOpen(person.id)}
         aria-label={t('tree.openDetails', { name })}
         title={name}
-        className={`tree-person-card flex h-full w-full items-center gap-2.5 rounded-xl border border-l-4 bg-white px-3 text-left shadow-[0_1px_3px_0_rgb(0_0_0_0.06)] ring-1 ring-stone-900/5 transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-brand-500 active:translate-y-0 dark:bg-stone-900 dark:shadow-[0_1px_3px_0_rgb(0_0_0_0.3)] dark:ring-white/5 dark:hover:shadow-lg dark:hover:shadow-black/40 ${
+        className={`tree-person-card flex h-full w-full items-center gap-2.5 rounded-xl border border-l-4 bg-[var(--shajira-card,#ffffff)] px-3 text-left shadow-[0_1px_3px_0_rgb(0_0_0_0.08)] ring-1 ring-stone-900/10 transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-2 focus-visible:ring-brand-500 active:translate-y-0 dark:bg-stone-900 dark:shadow-[0_1px_3px_0_rgb(0_0_0_0.3)] dark:ring-white/5 dark:hover:shadow-lg dark:hover:shadow-black/40 ${
           GENDER_ACCENT[person.gender]
         } ${
           person.isDeceased

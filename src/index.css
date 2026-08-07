@@ -132,15 +132,71 @@ html:not(.dark) .text-stone-400 {
   color: var(--color-stone-500);
 }
 
+/*
+ * Soft paper light theme — pure #fff is too bright on phones/monitors.
+ * Cool slate-blue surfaces (not cream) so Shajira stays on-brand and readable.
+ */
+html:not(.dark) {
+  --shajira-page: #b4c0ce;
+  --shajira-panel: #c5d0dc;
+  --shajira-card: #d5dee8;
+  --shajira-lift: #e2e9f1;
+  --shajira-border: rgb(71 85 105 / 0.28);
+  color-scheme: light;
+}
+
+html:not(.dark) body {
+  background-color: var(--shajira-page);
+  color: #1e293b;
+}
+
+/* Remap the brightest utilities so the whole app softens without editing every file. */
+html:not(.dark) .bg-white {
+  background-color: var(--shajira-card);
+}
+html:not(.dark) .bg-white\/95 {
+  background-color: color-mix(in srgb, var(--shajira-card) 95%, transparent);
+}
+html:not(.dark) .bg-white\/90 {
+  background-color: color-mix(in srgb, var(--shajira-card) 90%, transparent);
+}
+html:not(.dark) .bg-white\/70 {
+  background-color: color-mix(in srgb, var(--shajira-lift) 70%, transparent);
+}
+html:not(.dark) .bg-white\/60 {
+  background-color: color-mix(in srgb, var(--shajira-lift) 60%, transparent);
+}
+html:not(.dark) .bg-stone-50 {
+  background-color: var(--shajira-panel);
+}
+html:not(.dark) .bg-stone-50\/70 {
+  background-color: color-mix(in srgb, var(--shajira-panel) 70%, transparent);
+}
+html:not(.dark) .bg-stone-100 {
+  background-color: var(--shajira-panel);
+}
+html:not(.dark) .bg-stone-100\/80 {
+  background-color: color-mix(in srgb, var(--shajira-panel) 80%, transparent);
+}
+html:not(.dark) .border-stone-200,
+html:not(.dark) .border-stone-200\/80,
+html:not(.dark) .border-stone-200\/70,
+html:not(.dark) .border-stone-200\/60 {
+  border-color: var(--shajira-border);
+}
+html:not(.dark) .border-stone-300 {
+  border-color: rgb(71 85 105 / 0.35);
+}
+
 @layer components {
   .card {
-    @apply rounded-2xl border border-stone-300 bg-white shadow-[0_1px_3px_0_rgb(0_0_0_0.04)] dark:border-stone-800 dark:bg-stone-900 dark:shadow-[0_1px_3px_0_rgb(0_0_0_0.2)];
+    @apply rounded-2xl border border-stone-300 bg-[var(--shajira-card,#ffffff)] shadow-[0_1px_3px_0_rgb(0_0_0_0.06)] dark:border-stone-800 dark:bg-stone-900 dark:shadow-[0_1px_3px_0_rgb(0_0_0_0.2)];
   }
 
   /* 16px font on small screens stops iOS Safari from auto-zooming into
      focused fields; the taller padding gives a comfortable touch target. */
   .input {
-    @apply w-full rounded-xl border border-stone-400 bg-white px-3 py-2.5 text-base text-stone-900 shadow-sm outline-none transition-colors placeholder:text-stone-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 sm:py-2 sm:text-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:placeholder:text-stone-400;
+    @apply w-full rounded-xl border border-stone-400 bg-[var(--shajira-lift,#ffffff)] px-3 py-2.5 text-base text-stone-900 shadow-sm outline-none transition-colors placeholder:text-stone-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 sm:py-2 sm:text-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:placeholder:text-stone-400;
   }
 
   .badge {
@@ -436,9 +492,13 @@ html.easy .tree-easy .edge-child-flow {
 
 html:not(.dark) .home-hero {
   background:
-    radial-gradient(ellipse 90% 70% at 12% 18%, rgb(14 165 233 / 0.16), transparent 58%),
-    radial-gradient(ellipse 55% 45% at 88% 80%, rgb(245 215 142 / 0.12), transparent 50%),
-    linear-gradient(158deg, #e8f4fc 0%, #dbeaf6 40%, #eef4f8 70%, #f4f6f8 100%);
+    radial-gradient(ellipse 90% 70% at 12% 18%, rgb(14 165 233 / 0.22), transparent 58%),
+    radial-gradient(ellipse 55% 45% at 88% 80%, rgb(15 118 110 / 0.12), transparent 50%),
+    linear-gradient(158deg, #6b849c 0%, #7d93a8 35%, #8fa3b6 70%, #9aadc0 100%);
+}
+
+html:not(.dark) .home-hero__pedigree {
+  color: rgb(8 47 73 / 0.14);
 }
 
 .home-hero::after {
@@ -479,17 +539,17 @@ html:not(.dark) .home-hero {
 
 /* Home section cards — subtle containers for birthday/anniversary/founder blocks */
 .home-section-card {
-  @apply rounded-2xl border border-stone-200/80 bg-white/95 shadow-[0_1px_3px_0_rgb(0_0_0_0.04)] dark:border-stone-700/80 dark:bg-stone-900/95 dark:shadow-[0_1px_3px_0_rgb(0_0_0_0.20)];
+  @apply rounded-2xl border border-stone-200/80 bg-[var(--shajira-card,#ffffff)] shadow-[0_1px_3px_0_rgb(0_0_0_0.06)] dark:border-stone-700/80 dark:bg-stone-900/95 dark:shadow-[0_1px_3px_0_rgb(0_0_0_0.20)];
 }
 
 /* Home list items — hover-lift for interactive rows */
 .home-list-item {
-  @apply flex items-center gap-3 rounded-xl px-3 py-3 transition-all duration-150 hover:bg-stone-50 hover:shadow-sm hover:-translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500 sm:px-4 dark:hover:bg-stone-800/60;
+  @apply flex items-center gap-3 rounded-xl px-3 py-3 transition-all duration-150 hover:bg-[var(--shajira-lift,#fafaf9)] hover:shadow-sm hover:-translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500 sm:px-4 dark:hover:bg-stone-800/60;
 }
 
 /* Stat card in the mini dashboard */
 .home-stat-card {
-  @apply rounded-xl border border-stone-200/70 bg-white/90 p-4 shadow-[0_1px_2px_0_rgb(0_0_0_0.03)] dark:border-stone-700/70 dark:bg-stone-900/90;
+  @apply rounded-xl border border-stone-200/70 bg-[var(--shajira-lift,#ffffff)] p-4 shadow-[0_1px_2px_0_rgb(0_0_0_0.04)] dark:border-stone-700/70 dark:bg-stone-900/90;
 }
 
 @keyframes home-rise {
