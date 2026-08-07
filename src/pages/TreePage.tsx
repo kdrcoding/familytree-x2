@@ -654,7 +654,7 @@ export function TreePage() {
       </div>
 
       <div className="relative min-h-0 flex-1" style={{ minHeight: 'calc(100dvh - 12rem)' }}>
-        <div className="absolute inset-0 bg-stone-50 dark:bg-stone-950">
+        <div className="absolute inset-0 bg-[var(--shajira-page,#e7e5e4)] dark:bg-stone-950">
           <TreeInteractionContext.Provider value={interaction}>
             <ReactFlowProvider>
               <TreeCanvas
