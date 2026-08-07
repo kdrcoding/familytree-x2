@@ -1,7 +1,7 @@
 /**
- * All user-visible text in both languages. Uzbek (Latin script) is the
- * default; English is the second option. Placeholders like {name} are
- * replaced via the t() hook in src/i18n/useT.ts.
+ * All user-visible text. Russian is the Shajira default; English and Uzbek
+ * are the other options. Placeholders like {name} are replaced via the t()
+ * hook in src/i18n/useT.ts.
  */
 import { ruOverrides } from './ru';
 
@@ -27,13 +27,13 @@ export const en = {
   'nav.bottomNav': 'Bottom navigation',
   'nav.mainNav': 'Main navigation',
   'nav.mobileNav': 'Mobile navigation',
-  'nav.langCycle': 'Change language (UZ → EN → RU)',
+  'nav.langCycle': 'Change language (RU → EN → UZ)',
   'nav.more': 'More',
   'nav.language': 'Language',
   'nav.signOut': 'Sign out',
   'nav.signOutConfirmTitle': 'Sign out of the site?',
   'nav.signOutConfirmMsg': 'You will need the family password to enter again.',
-  'footer.note': 'A private family history project. All sample people are fictional.',
+  'footer.note': 'A private Shajira family history project.',
 
   // Author credit
   'credit.madeBy': 'App made by Kadir',
@@ -700,6 +700,8 @@ export const en = {
     'This site needs the VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables. See the "Shared data with Supabase" section of the README.',
   'db.saveFailed':
     'Could not save to the shared database — this change is only visible here until it is saved. Check your connection and try again.',
+  'db.sessionRequired':
+    'Your login session expired. Sign out, unlock again with the family password, then retry.',
   'db.refreshFailed':
     'Could not refresh from the database. Still showing the latest data on this device.',
 
@@ -799,13 +801,13 @@ export const uz: Record<TKey, string> = {
   'nav.bottomNav': 'Pastki menyu',
   'nav.mainNav': 'Asosiy menyu',
   'nav.mobileNav': 'Mobil menyu',
-  'nav.langCycle': 'Tilni almashtirish (UZ → EN → RU)',
+  'nav.langCycle': 'Tilni almashtirish (RU → EN → UZ)',
   'nav.more': 'Yana',
   'nav.language': 'Til',
   'nav.signOut': 'Chiqish',
   'nav.signOutConfirmTitle': 'Saytdan chiqilsinmi?',
   'nav.signOutConfirmMsg': "Qayta kirish uchun oila paroli kerak bo'ladi.",
-  'footer.note': "Shaxsiy oilaviy tarix loyihasi. Namunadagi odamlar to'qib chiqarilgan.",
+  'footer.note': 'Shajira — shaxsiy oilaviy tarix loyihasi.',
 
   'credit.madeBy': 'Ilova muallifi — Kadir',
   'credit.contactTitle': "Bog'lanish",
@@ -1447,6 +1449,8 @@ export const uz: Record<TKey, string> = {
     "Bu saytga VITE_SUPABASE_URL va VITE_SUPABASE_ANON_KEY muhit o'zgaruvchilari kerak. README dagi \"Shared data with Supabase\" bo'limiga qarang.",
   'db.saveFailed':
     "Umumiy ma'lumotlar bazasiga saqlab bo'lmadi — bu o'zgarish saqlanmaguncha faqat shu yerda ko'rinadi. Aloqani tekshirib, qayta urinib ko'ring.",
+  'db.sessionRequired':
+    "Sessiya tugagan. Chiqing, oila paroli bilan qayta kiring, so'ng qayta urinib ko'ring.",
   'db.refreshFailed':
     "Ma'lumotlar bazasidan yangilab bo'lmadi. Shu qurilmadagi eng so'nggi ma'lumotlar ko'rsatilmoqda.",
 

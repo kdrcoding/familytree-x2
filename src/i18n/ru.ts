@@ -23,7 +23,7 @@ export const ruOverrides: Record<string, string> = {
   'nav.bottomNav': 'Нижнее меню',
   'nav.more': 'Ещё',
   'nav.language': 'Язык',
-  'footer.note': 'Частный семейный проект. Все примеры вымышлены.',
+  'footer.note': 'Частный семейный проект Shajira.',
 
   'home.kicker': 'Поколения одной семьи',
   'home.title': 'Семейное древо Shajira',
@@ -394,7 +394,7 @@ export const ruOverrides: Record<string, string> = {
 
   'nav.mainNav': 'Главное меню',
   'nav.mobileNav': 'Мобильное меню',
-  'nav.langCycle': 'Сменить язык (UZ → EN → RU)',
+  'nav.langCycle': 'Сменить язык (RU → EN → UZ)',
   'home.summaryLabel': 'Сводка по семье',
 
   'tree.print': 'Печать',
@@ -591,6 +591,8 @@ export const ruOverrides: Record<string, string> = {
   'db.unconfiguredTitle': 'База данных не настроена',
   'db.unconfiguredText': 'Для сайта нужны VITE_SUPABASE_URL и VITE_SUPABASE_ANON_KEY. См. раздел README.',
   'db.saveFailed': 'Не удалось сохранить в общую базу — изменение видно только здесь.',
+  'db.sessionRequired':
+    'Сессия истекла. Выйдите, снова войдите с семейным паролем и повторите действие.',
   'db.refreshFailed': 'Не удалось обновить данные. Показываем последние данные на этом устройстве.',
 
   // Settings backups

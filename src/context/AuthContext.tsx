@@ -13,6 +13,8 @@ interface AuthContextValue {
   ready: boolean;
   canEdit: boolean;
   canDelete: boolean;
+  /** True when Supabase Auth has a live session (required for DB writes). */
+  hasDbSession: boolean;
   signIn: (password: string) => Promise<Role | null>;
   signOut: () => void;
 }
@@ -34,35 +36,40 @@ function roleForEmail(email: string | undefined): Role {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [role, setRole] = useState<Role>('viewer');
   const [ready, setReady] = useState(false);
+  const [hasDbSession, setHasDbSession] = useState(false);
 
   useEffect(() => {
-    // Restore the remembered credential: a legacy hash always restores
-    // (harmless when the database is locked down — data access still needs
-    // a real session), and a Supabase session upgrades/overrides it.
-    const stored = loadJson<string>(AUTH_KEY, (v): v is string => typeof v === 'string');
-    if (stored) {
-      const restored = roleForHash(stored);
-      if (restored === 'viewer') removeKey(AUTH_KEY);
-      else setRole(restored);
-    }
     if (!supabase) {
+      // No shared DB — local hash unlock is enough for browsing a static copy.
+      const stored = loadJson<string>(AUTH_KEY, (v): v is string => typeof v === 'string');
+      if (stored) {
+        const restored = roleForHash(stored);
+        if (restored === 'viewer') removeKey(AUTH_KEY);
+        else setRole(restored);
+      }
       setReady(true);
       return;
     }
+
+    // Supabase is configured: a legacy password-hash in localStorage must NOT
+    // unlock the UI. That path used to set role=owner with no JWT, so every
+    // save hit Row Level Security and looked like "database broken".
+    removeKey(AUTH_KEY);
+
     void supabase.auth.getSession().then(({ data }) => {
       const fromSession = roleForEmail(data.session?.user.email);
+      setHasDbSession(Boolean(data.session) && fromSession !== 'viewer');
       if (fromSession !== 'viewer') setRole(fromSession);
       setReady(true);
     });
-    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       const fromSession = roleForEmail(session?.user.email);
+      setHasDbSession(Boolean(session) && fromSession !== 'viewer');
       if (fromSession !== 'viewer') {
         setRole(fromSession);
-      } else if (event === 'SIGNED_OUT') {
-        // Sign-out in another tab (or a dead session) locks this tab too,
-        // unless a legacy hash credential is still valid.
-        const hash = loadJson<string>(AUTH_KEY, (v): v is string => typeof v === 'string');
-        setRole(hash ? roleForHash(hash) : 'viewer');
+      } else {
+        setRole('viewer');
       }
     });
     return () => sub.subscription.unsubscribe();
@@ -70,22 +77,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback(async (password: string): Promise<Role | null> => {
     if (supabase) {
-      // Real authentication first: one shared password per role, so try the
-      // owner account, then the family account (sign-ups are disabled).
+      // Real authentication only — one shared password per role.
       for (const email of [AUTH_EMAILS.owner, AUTH_EMAILS.editor]) {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (!error && data.session) {
           const found = roleForEmail(data.session.user.email);
           if (found !== 'viewer') {
+            removeKey(AUTH_KEY);
+            setHasDbSession(true);
             setRole(found);
             return found;
           }
         }
       }
-      // The auth accounts may not exist yet (one-time dashboard setup not
-      // done). Fall back to the built-in hash check so the site keeps
-      // working until then; real auth takes over once the accounts exist.
+      // Do not fall back to hash-only when the DB is configured: without a
+      // Supabase session, RLS rejects every write.
+      return null;
     }
+
     const hash = await hashPassword(password);
     const found = roleForHash(hash);
     if (found === 'viewer') return null;
@@ -97,6 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(() => {
     if (supabase) void supabase.auth.signOut();
     removeKey(AUTH_KEY);
+    setHasDbSession(false);
     setRole('viewer');
   }, []);
 
@@ -106,10 +116,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ready,
       canEdit: role === 'editor' || role === 'owner',
       canDelete: role === 'owner',
+      hasDbSession,
       signIn,
       signOut,
     }),
-    [role, ready, signIn, signOut],
+    [role, ready, hasDbSession, signIn, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -220,7 +220,14 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
         });
       return pushed.catch((error: unknown) => {
         console.error('Failed to save family data to Supabase:', error);
-        toast(translate(language, 'db.saveFailed'), 'error');
+        const message = error instanceof Error ? error.message : String(error ?? '');
+        const needsSession = /row-level security|JWT|not authenticated|invalid claim/i.test(
+          message,
+        );
+        toast(
+          translate(language, needsSession ? 'db.sessionRequired' : 'db.saveFailed'),
+          'error',
+        );
         // Roll back the optimistic change so the screen — and the diff for the
         // next edit — reflect what actually reached the database. Without this
         // a failed save (common on a flaky phone connection) keeps showing as
