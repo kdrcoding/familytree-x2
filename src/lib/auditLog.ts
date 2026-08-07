@@ -1,0 +1,196 @@
+import { supabase } from './supabase';
+import type { FamilyPerson } from '../types/family';
+import { fullName } from '../utils/family';
+import { loadJson, STORAGE_KEYS } from '../utils/storage';
+
+/** What kind of operation produced a change (set by the calling action). */
+export type AuditAction = 'add' | 'edit' | 'delete' | 'divorce' | 'import' | 'reset';
+
+export interface AuditDetails {
+  added?: string[];
+  deleted?: string[];
+  updated?: { name: string; fields: string[] }[];
+}
+
+export interface AuditEntry {
+  id: number;
+  at: string;
+  actor: string;
+  /** The name typed at sign-in — who on the shared password did it. */
+  actor_name?: string | null;
+  action: AuditAction | string;
+  details: AuditDetails;
+}
+
+const PERSON_FIELDS = [
+  'firstName',
+  'lastName',
+  'nickname',
+  'gender',
+  'birthDate',
+  'deathDate',
+  'isDeceased',
+  'photo',
+  'city',
+  'country',
+  'occupation',
+  'biography',
+] as const;
+
+function sameIds(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) return false;
+  const set = new Set(a);
+  return b.every((id) => set.has(id));
+}
+
+function sameMarriageDates(
+  a: Record<string, string> | undefined,
+  b: Record<string, string> | undefined,
+): boolean {
+  const left = a ?? {};
+  const right = b ?? {};
+  const keys = new Set([...Object.keys(left), ...Object.keys(right)]);
+  for (const key of keys) {
+    if ((left[key] ?? '') !== (right[key] ?? '')) return false;
+  }
+  return true;
+}
+
+function capped(names: string[]): string[] {
+  return names.length > 20 ? [...names.slice(0, 20), `… +${names.length - 20}`] : names;
+}
+
+/** Coerce jsonb / string / null into a safe AuditDetails object. */
+export function normalizeAuditDetails(raw: unknown): AuditDetails {
+  let value: unknown = raw;
+  if (typeof value === 'string') {
+    try {
+      value = JSON.parse(value) as unknown;
+    } catch {
+      return {};
+    }
+  }
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  const obj = value as Record<string, unknown>;
+  const details: AuditDetails = {};
+  if (Array.isArray(obj.added)) {
+    details.added = obj.added.filter((x): x is string => typeof x === 'string');
+  }
+  if (Array.isArray(obj.deleted)) {
+    details.deleted = obj.deleted.filter((x): x is string => typeof x === 'string');
+  }
+  if (Array.isArray(obj.updated)) {
+    details.updated = obj.updated
+      .map((row) => {
+        if (!row || typeof row !== 'object') return null;
+        const item = row as Record<string, unknown>;
+        const name = typeof item.name === 'string' ? item.name : '';
+        const fields = Array.isArray(item.fields)
+          ? item.fields.filter((f): f is string => typeof f === 'string')
+          : [];
+        if (!name && fields.length === 0) return null;
+        return { name: name || '—', fields };
+      })
+      .filter((row): row is { name: string; fields: string[] } => row !== null);
+  }
+  return details;
+}
+
+/**
+ * Human-readable summary of what changed between two versions of the family:
+ * who was added/deleted, and which fields or relationships changed on whom.
+ * Returns null when nothing actually changed.
+ */
+export function summarizeFamilyChange(
+  prev: FamilyPerson[],
+  next: FamilyPerson[],
+): AuditDetails | null {
+  const prevById = new Map(prev.map((p) => [p.id, p]));
+  const nextIds = new Set(next.map((p) => p.id));
+
+  const added = next.filter((p) => !prevById.has(p.id)).map(fullName);
+  const deleted = prev.filter((p) => !nextIds.has(p.id)).map(fullName);
+
+  const updated: { name: string; fields: string[] }[] = [];
+  for (const person of next) {
+    const before = prevById.get(person.id);
+    if (!before) continue;
+    const fields: string[] = [];
+    for (const key of PERSON_FIELDS) {
+      if ((before[key] ?? '') !== (person[key] ?? '')) fields.push(key);
+    }
+    if (!sameIds(before.parentIds, person.parentIds)) fields.push('parents');
+    if (!sameIds(before.spouseIds, person.spouseIds)) fields.push('spouses');
+    if (!sameIds(before.childIds, person.childIds)) fields.push('children');
+    if (!sameIds(before.divorcedIds ?? [], person.divorcedIds ?? [])) fields.push('divorced');
+    if (!sameMarriageDates(before.marriageDates, person.marriageDates)) {
+      fields.push('marriageDates');
+    }
+    if (fields.length > 0) updated.push({ name: fullName(person), fields });
+  }
+
+  if (added.length === 0 && deleted.length === 0 && updated.length === 0) return null;
+  return {
+    added: added.length ? capped(added) : undefined,
+    deleted: deleted.length ? capped(deleted) : undefined,
+    updated: updated.length ? updated.slice(0, 20) : undefined,
+  };
+}
+
+async function callLogRpc(
+  action: AuditAction,
+  details: AuditDetails,
+  actorName: string | null,
+): Promise<void> {
+  if (!supabase) return;
+  const client = supabase;
+
+  // Prefer the 3-argument form (actor name). Fall back to the older signature
+  // when the one-time upgrade SQL has not been run yet.
+  const withName = await client.rpc('log_family_change', {
+    p_action: action,
+    p_details: details,
+    p_actor_name: actorName,
+  });
+  if (!withName.error) return;
+
+  const fallback = await client.rpc('log_family_change', {
+    p_action: action,
+    p_details: details,
+  });
+  if (fallback.error) {
+    console.error('Failed to record change in the log:', withName.error, fallback.error);
+  }
+}
+
+/**
+ * Record a change in the owner-only log. Fire-and-forget: the database
+ * function stamps who did it from the signed-in account, so the entry
+ * can't be forged.
+ */
+export function logChange(action: AuditAction, details: AuditDetails): void {
+  const actorName =
+    loadJson<string>(STORAGE_KEYS.displayName, (v): v is string => typeof v === 'string')?.trim() ||
+    null;
+  void callLogRpc(action, details, actorName);
+}
+
+/** Owner-only: newest entries first. */
+export async function listAuditLog(limit = 200): Promise<AuditEntry[]> {
+  if (!supabase) return [];
+  // select('*') keeps this working whether or not the actor_name column
+  // exists yet (it arrives with the upgrade SQL).
+  const { data, error } = await supabase
+    .from('family_audit_log')
+    .select('*')
+    .order('at', { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return (data ?? []).map((row) => {
+    const entry = row as AuditEntry;
+    return {
+      ...entry,
+      details: normalizeAuditDetails(entry.details),
+    };
+  });
+}

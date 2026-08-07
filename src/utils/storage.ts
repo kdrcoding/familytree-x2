@@ -1,0 +1,67 @@
+// LocalStorage is only used for per-browser UI preferences and the remembered
+// password. The family data itself lives in Supabase (src/lib/familyDb.ts).
+// Keys use the `shajira.` prefix so this app never clashes with Oq-Ariq OILASI
+// on the same device.
+export const STORAGE_KEYS = {
+  settings: 'shajira.settings.v1',
+  // v2: the tree now defaults to fully expanded (everyone shown). Bumping the
+  // key drops the old auto-collapsed state so existing devices start expanded.
+  collapsed: 'shajira.collapsed.v2',
+  auth: 'shajira.auth.v1',
+  // The person add/edit form autosaves here so an accidental reload (or a
+  // phone browser discarding the backgrounded tab) doesn't lose typed work.
+  formDraft: 'shajira.formDraft.v1',
+  // Last date (YYYY-MM-DD) we showed the "birthday today" toast, so it fires
+  // at most once per day per browser.
+  birthdayNotified: 'shajira.birthdayNotified.v1',
+  // The person's own name, asked at sign-in, attached to change-log entries
+  // so the owner can see WHO on the shared family password edited what.
+  displayName: 'shajira.displayName.v1',
+  // Signed URLs for Storage-hosted photos, reused until near expiry so the
+  // browser cache keeps working across visits.
+  photoUrls: 'shajira.photoUrls.v1',
+  // Tree view preferences.
+  treeOrientation: 'shajira.treeOrientation.v1',
+  treeSpacing: 'shajira.treeSpacing.v1',
+  // Dismissed the one-time "how to use the tree" tip.
+  treeTipSeen: 'shajira.treeTipSeen.v1',
+  // First-visit welcome tour completed.
+  tourSeen: 'shajira.tourSeen.v1',
+  // Dismissed invite banner for this browser session key.
+  inviteBannerDismissed: 'shajira.inviteBanner.v1',
+} as const;
+
+/**
+ * Read and parse a LocalStorage entry. Returns `null` when the entry is
+ * missing, unparsable or rejected by the optional validator, so callers can
+ * always fall back to defaults safely.
+ */
+export function loadJson<T>(key: string, validate?: (value: unknown) => value is T): T | null {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw === null) return null;
+    const parsed: unknown = JSON.parse(raw);
+    if (validate && !validate(parsed)) return null;
+    return parsed as T;
+  } catch {
+    return null;
+  }
+}
+
+export function saveJson(key: string, value: unknown): boolean {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch {
+    // Storage may be full or blocked; the app keeps working in memory.
+    return false;
+  }
+}
+
+export function removeKey(key: string): void {
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    // Ignore - nothing to clean up if storage is unavailable.
+  }
+}

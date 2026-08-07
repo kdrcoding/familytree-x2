@@ -1,0 +1,599 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans:
+    'Outfit', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  --font-display: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+
+  /* Shajira brand — deep sapphire (distinct from Oq-Ariq emerald) */
+  --color-brand-50: #f0f9ff;
+  --color-brand-100: #e0f2fe;
+  --color-brand-200: #bae6fd;
+  --color-brand-300: #7dd3fc;
+  --color-brand-400: #38bdf8;
+  --color-brand-500: #0ea5e9;
+  --color-brand-600: #0284c7;
+  --color-brand-700: #0369a1;
+  --color-brand-800: #075985;
+  --color-brand-900: #0c4a6e;
+  --color-brand-950: #082f49;
+
+  --animate-modal-in: modal-in 0.18s ease-out;
+
+  @keyframes modal-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Backdrop fade — pairs with the modal panel's slide-up. */
+  --animate-fade-in: fade-in 0.18s ease-out;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Toast entrance: rise + fade from the bottom of the screen. */
+  --animate-toast-in: toast-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Staggered list reveal (member cards). `both` keeps cards hidden during
+     their delay so nothing flashes in before its turn. */
+  --animate-rise-in: rise-in 0.35s ease-out both;
+
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+    /* Slightly larger base so the whole UI reads comfortably for older family
+       members. Tailwind sizes are rem-based, so this scales text AND spacing
+       proportionally without breaking any layout. */
+    font-size: 17px;
+    /* Tell the browser which palette native controls (select dropdowns, date
+       pickers, checkboxes, scrollbars, form autofill) should use. Without
+       this, a phone whose OS is in dark mode renders those native bits dark
+       even while the app is on the light theme — producing dark-on-white or
+       invisible text. Bound to the app's own theme, not the OS preference. */
+    color-scheme: light;
+  }
+  /* Easy Mode: bigger type and tap targets for older relatives. */
+  html.easy {
+    font-size: 20px;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    @apply antialiased;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+    /* Disable the browser's pull-to-refresh gesture. On phones a long edit
+       form lives in a scrollable modal; swiping down to scroll up past the top
+       would otherwise trigger a full page reload and wipe the user's unsaved
+       work — reported as the page "refreshing by itself". */
+    overscroll-behavior-y: contain;
+    /* Smooth momentum scrolling inside scrollable regions on iOS. */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Honour the OS "reduce motion" setting: strip animations and transitions
+     for users who get motion sickness or simply prefer a calmer UI. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Light theme readability: the very lightest muted text (text-stone-400 on
+   white, ~2.9:1) is hard for older eyes. Nudge it one shade darker so
+   secondary details stay comfortably legible. Unlayered so it wins over the
+   Tailwind utility; scoped to light mode only, so dark mode is untouched. */
+html:not(.dark) .text-stone-400 {
+  color: var(--color-stone-500);
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-stone-300 bg-white shadow-[0_1px_3px_0_rgb(0_0_0_0.04)] dark:border-stone-800 dark:bg-stone-900 dark:shadow-[0_1px_3px_0_rgb(0_0_0_0.2)];
+  }
+
+  /* 16px font on small screens stops iOS Safari from auto-zooming into
+     focused fields; the taller padding gives a comfortable touch target. */
+  .input {
+    @apply w-full rounded-xl border border-stone-400 bg-white px-3 py-2.5 text-base text-stone-900 shadow-sm outline-none transition-colors placeholder:text-stone-500 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 sm:py-2 sm:text-sm dark:border-stone-600 dark:bg-stone-800 dark:text-stone-100 dark:placeholder:text-stone-400;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium;
+  }
+
+  /* Buttons are slightly taller on touch screens (~44px targets). The
+     `active:scale-95` gives a tactile press response on phones (no hover). */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-xl bg-brand-700 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm transition-[background-color,transform] hover:bg-brand-800 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:opacity-50 sm:py-2 dark:bg-brand-600 dark:hover:bg-brand-500 dark:focus-visible:ring-offset-stone-900;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-xl border border-stone-300 bg-white px-3.5 py-2.5 text-sm font-semibold text-stone-700 shadow-sm transition-[background-color,transform] hover:bg-stone-100 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:opacity-50 sm:py-2 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-stone-700 dark:focus-visible:ring-offset-stone-900;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-xl bg-red-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm transition-[background-color,transform] hover:bg-red-700 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 disabled:opacity-50 sm:py-2 dark:focus-visible:ring-offset-stone-900;
+  }
+
+  /* Easy Mode: taller buttons, easier to tap. */
+  html.easy .btn-primary,
+  html.easy .btn-secondary,
+  html.easy .btn-danger {
+    @apply px-5 py-3.5 text-base sm:py-3;
+  }
+
+  html.easy .input {
+    @apply py-3.5 text-base sm:py-3 sm:text-base;
+  }
+
+  html.easy .icon-btn {
+    @apply p-3 sm:p-2.5;
+  }
+
+  /* Bigger on touch screens — 24px circles are too small for fingers. */
+  .quick-add {
+    @apply flex h-8 w-8 items-center justify-center rounded-full border border-brand-300 bg-white text-brand-700 shadow-sm transition-transform hover:scale-110 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 sm:h-6 sm:w-6 dark:border-brand-700 dark:bg-stone-800 dark:text-brand-300 dark:hover:bg-stone-700;
+  }
+
+  .icon-btn {
+    @apply inline-flex items-center justify-center rounded-xl p-2.5 text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 sm:p-2 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100;
+  }
+
+  /* Swipeable rows on phones without a visible scrollbar. */
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Family map: dim OpenStreetMap tiles in dark mode so the page stays dark. */
+.dark .map-tiles {
+  filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
+.dark .leaflet-container {
+  background: var(--color-stone-900);
+}
+.dark .leaflet-popup-content-wrapper,
+.dark .leaflet-popup-tip {
+  background: var(--color-stone-800);
+  color: var(--color-stone-100);
+}
+
+/* React Flow edge styling */
+.react-flow__edge-path {
+  stroke: var(--color-stone-400);
+  stroke-width: 1.5;
+}
+.dark .react-flow__edge-path {
+  stroke: var(--color-stone-600);
+}
+.edge-spouse .react-flow__edge-path {
+  stroke: var(--color-rose-400);
+  stroke-width: 2;
+}
+.dark .edge-spouse .react-flow__edge-path {
+  stroke: var(--color-rose-600);
+}
+/* Divorced couples: a broken grey line instead of the rose marriage line. */
+.edge-divorced .react-flow__edge-path {
+  stroke: var(--color-stone-400);
+  stroke-width: 2;
+  stroke-dasharray: 2 5;
+}
+.dark .edge-divorced .react-flow__edge-path {
+  stroke: var(--color-stone-500);
+}
+/* Parent -> child lines: colour comes from per-couple DNA data (inline). */
+.edge-child .react-flow__edge-path {
+  stroke-width: 2;
+}
+
+/* DNA-style flow: two dashed strands travel parent → child and loop.
+   Stroke colour is set inline per family line. */
+@keyframes edge-dna-flow {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+
+.edge-child-flow {
+  pointer-events: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.edge-child-flow--a {
+  stroke-width: 2.25;
+  stroke-dasharray: 5 7 2 7 5 6;
+  animation: edge-dna-flow 1.6s linear infinite;
+}
+
+.edge-child-flow--b {
+  stroke-width: 1.75;
+  stroke-dasharray: 2 7 5 7 2 9;
+  stroke-dashoffset: 16;
+  opacity: 0.9;
+  animation: edge-dna-flow 1.6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .edge-child-flow--a,
+  .edge-child-flow--b {
+    animation: none;
+  }
+}
+
+/* Touch screens: thicker relationship lines and finger-sized zoom controls
+   so the tree stays readable and usable on phones. */
+@media (pointer: coarse) {
+  .react-flow__edge-path {
+    stroke-width: 2.5;
+  }
+  .edge-spouse .react-flow__edge-path,
+  .edge-divorced .react-flow__edge-path,
+  .edge-child .react-flow__edge-path {
+    stroke-width: 3;
+  }
+  .react-flow__controls-button {
+    height: 40px;
+    width: 40px;
+  }
+  .react-flow__controls-button svg {
+    max-height: 16px;
+    max-width: 16px;
+  }
+}
+
+/* —— Tree page toolbar —— */
+.tree-page-toolbar {
+  @apply border-b border-stone-200/80 bg-white/90 px-3 py-2.5 shadow-[0_1px_3px_0_rgb(0_0_0_0.04)] backdrop-blur-sm sm:px-4 sm:py-3 dark:border-stone-800 dark:bg-stone-900/90 dark:shadow-[0_1px_3px_0_rgb(0_0_0_0.24)];
+}
+
+/* —— Tree search refinement —— */
+.tree-search-input {
+  @apply w-full rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-base text-stone-900 shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20 sm:py-2 sm:text-sm dark:border-stone-600 dark:bg-stone-800/80 dark:text-stone-100 dark:placeholder:text-stone-500 dark:focus:border-brand-500;
+}
+
+.tree-search-dropdown {
+  @apply absolute z-30 mt-1.5 max-h-80 w-full overflow-y-auto rounded-xl border border-stone-200 bg-white p-1.5 shadow-lg shadow-stone-900/6 dark:border-stone-700 dark:bg-stone-900 dark:shadow-black/30;
+}
+
+.tree-search-result {
+  @apply flex w-full items-center gap-3 rounded-lg px-3 text-left transition-colors hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500 dark:hover:bg-brand-950/40;
+}
+
+/* Family tree canvas — calm stone surfaces for light + dark */
+.family-tree-canvas {
+  background: transparent !important;
+}
+.family-tree-canvas .react-flow__renderer,
+.family-tree-canvas .react-flow__pane {
+  cursor: grab;
+}
+.family-tree-canvas .react-flow__pane:active {
+  cursor: grabbing;
+}
+
+.family-tree-controls {
+  background: rgb(255 255 255 / 0.95) !important;
+  box-shadow: 0 4px 14px rgb(28 25 23 / 0.08) !important;
+}
+.family-tree-controls .react-flow__controls-button {
+  background: transparent;
+  border-bottom-color: var(--color-stone-200);
+  fill: var(--color-stone-700);
+  transition: background 0.12s;
+}
+.family-tree-controls .react-flow__controls-button:hover {
+  background: var(--color-stone-100);
+}
+
+.dark .family-tree-controls {
+  background: rgb(28 25 23 / 0.95) !important;
+  border-color: var(--color-stone-700) !important;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.35) !important;
+}
+.dark .family-tree-controls .react-flow__controls-button {
+  background: transparent;
+  border-bottom-color: var(--color-stone-700);
+  fill: var(--color-stone-200);
+}
+.dark .family-tree-controls .react-flow__controls-button:hover {
+  background: var(--color-stone-800);
+}
+
+/* DNA halo: softer on light canvas so coloured strands stay clear */
+.family-tree-canvas--light {
+  --child-edge-halo: #f5f5f4;
+}
+.family-tree-canvas--dark {
+  --child-edge-halo: #0c0a09;
+}
+
+/* Easy / older-adult tree controls: finger-sized zoom buttons */
+html.easy .tree-controls-easy .react-flow__controls-button,
+.tree-controls-easy .react-flow__controls-button {
+  width: 44px;
+  height: 44px;
+}
+html.easy .tree-easy .react-flow__node-person {
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 0.1));
+}
+html.easy .tree-easy .tree-person-card {
+  border-width: 2px;
+  border-left-width: 6px;
+}
+html.easy .tree-easy .tree-person-name {
+  font-size: 17px;
+  line-height: 1.2;
+}
+html.easy .tree-easy .tree-person-meta {
+  font-size: 14px;
+}
+html.easy .tree-easy .tree-branch-toggle {
+  min-width: 34px;
+  min-height: 28px;
+  font-size: 12px;
+}
+html.easy .tree-easy .react-flow__edge-path {
+  stroke-width: 3.5;
+  opacity: 0.9;
+}
+html.easy .tree-easy .edge-child-flow {
+  animation: none;
+  opacity: 1;
+}
+
+/* React Flow chrome in dark mode */
+.dark .react-flow__minimap {
+  background: var(--color-stone-900);
+  border-color: var(--color-stone-700) !important;
+}
+.dark .react-flow__minimap-mask {
+  fill: rgb(0 0 0 / 0.45);
+}
+.dark .react-flow__attribution {
+  background: rgb(28 25 23 / 0.7);
+  color: var(--color-stone-400);
+}
+
+/* Tree legend panel */
+.tree-legend {
+  @apply rounded-xl border border-stone-200/80 bg-white/95 p-2.5 text-[11px] shadow-sm backdrop-blur dark:border-stone-700/80 dark:bg-stone-900/95;
+}
+
+/* Tree tip panel */
+.tree-tip {
+  @apply max-w-[min(100%-1rem,20rem)] rounded-xl border border-brand-200/80 bg-white/95 px-2.5 py-2 text-xs shadow-sm backdrop-blur sm:max-w-md sm:p-3 sm:text-sm dark:border-brand-800/80 dark:bg-stone-900/95;
+}
+
+/* Tree action buttons (zoom-to-fit, zoom-readable) */
+.tree-action-btn {
+  @apply rounded-xl border border-stone-200/90 bg-white/95 px-2.5 py-2 text-xs font-semibold text-stone-600 shadow-sm backdrop-blur transition-all hover:border-brand-400 hover:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-stone-700 dark:bg-stone-900/95 dark:text-stone-300 dark:hover:border-brand-600 dark:hover:text-brand-300;
+}
+
+/* Empty tree state */
+.tree-empty {
+  @apply flex flex-1 flex-col items-center justify-center gap-5 p-8 text-center;
+}
+
+/* —— Home page: heritage hero + calm sections —— */
+.home-hero {
+  background:
+    radial-gradient(ellipse 90% 70% at 12% 18%, rgb(14 165 233 / 0.28), transparent 58%),
+    radial-gradient(ellipse 55% 45% at 88% 80%, rgb(245 215 142 / 0.14), transparent 50%),
+    linear-gradient(158deg, #06101c 0%, #0a2744 38%, #0c3d5c 68%, #0f2a3a 88%, #0c0a09 100%);
+  position: relative;
+}
+
+html:not(.dark) .home-hero {
+  background:
+    radial-gradient(ellipse 90% 70% at 12% 18%, rgb(14 165 233 / 0.16), transparent 58%),
+    radial-gradient(ellipse 55% 45% at 88% 80%, rgb(245 215 142 / 0.12), transparent 50%),
+    linear-gradient(158deg, #e8f4fc 0%, #dbeaf6 40%, #eef4f8 70%, #f4f6f8 100%);
+}
+
+.home-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4rem;
+  background: linear-gradient(to top, rgb(0 0 0 / 0.12), transparent);
+  pointer-events: none;
+}
+
+.home-hero__atmosphere {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.home-hero__pedigree {
+  position: absolute;
+  right: -10%;
+  top: 50%;
+  width: min(30rem, 75vw);
+  height: auto;
+  color: rgb(186 230 253 / 0.12);
+  transform: translateY(-48%);
+}
+
+@media (min-width: 640px) {
+  .home-hero__pedigree {
+    right: 0%;
+    width: min(28rem, 44vw);
+    color: rgb(186 230 253 / 0.16);
+  }
+}
+
+/* Home section cards — subtle containers for birthday/anniversary/founder blocks */
+.home-section-card {
+  @apply rounded-2xl border border-stone-200/80 bg-white/95 shadow-[0_1px_3px_0_rgb(0_0_0_0.04)] dark:border-stone-700/80 dark:bg-stone-900/95 dark:shadow-[0_1px_3px_0_rgb(0_0_0_0.20)];
+}
+
+/* Home list items — hover-lift for interactive rows */
+.home-list-item {
+  @apply flex items-center gap-3 rounded-xl px-3 py-3 transition-all duration-150 hover:bg-stone-50 hover:shadow-sm hover:-translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500 sm:px-4 dark:hover:bg-stone-800/60;
+}
+
+/* Stat card in the mini dashboard */
+.home-stat-card {
+  @apply rounded-xl border border-stone-200/70 bg-white/90 p-4 shadow-[0_1px_2px_0_rgb(0_0_0_0.03)] dark:border-stone-700/70 dark:bg-stone-900/90;
+}
+
+@keyframes home-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.home-hero__mark,
+.home-hero__kicker,
+.home-hero__title,
+.home-hero__intro,
+.home-hero__search,
+.home-hero__actions {
+  animation: home-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.home-hero__mark {
+  animation-delay: 0.04s;
+}
+.home-hero__kicker {
+  animation-delay: 0.1s;
+}
+.home-hero__title {
+  animation-delay: 0.16s;
+}
+.home-hero__intro {
+  animation-delay: 0.22s;
+}
+.home-hero__search {
+  animation-delay: 0.3s;
+}
+.home-hero__actions {
+  animation-delay: 0.38s;
+}
+
+.home-section {
+  animation: home-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.2s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero__mark,
+  .home-hero__kicker,
+  .home-hero__title,
+  .home-hero__intro,
+  .home-hero__search,
+  .home-hero__actions,
+  .home-section {
+    animation: none;
+  }
+}
+
+/* Print styles: hide nav, buttons, overlays; force light background */
+@media print {
+  nav,
+  .bottom-nav,
+  .top-nav,
+  button,
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger,
+  .react-flow__controls,
+  .react-flow__minimap,
+  .leaflet-control-zoom,
+  .leaflet-control-attribution,
+  .toast,
+  [role='dialog'],
+  [role='tooltip'] {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .card,
+  .home-section-card,
+  .home-stat-card {
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    background: #fff !important;
+  }
+  .home-hero {
+    background: #f5f5f4 !important;
+    color: #1c1917 !important;
+    padding: 1rem !important;
+  }
+  .react-flow__renderer,
+  .react-flow__pane {
+    background: #fff !important;
+  }
+  .leaflet-container {
+    background: #f5f5f4 !important;
+  }
+  a {
+    color: #000 !important;
+    text-decoration: underline !important;
+  }
+  @page {
+    margin: 1.5cm;
+  }
+}

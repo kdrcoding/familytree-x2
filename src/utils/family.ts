@@ -1,0 +1,433 @@
+import type { FamilyPerson, RelationLink } from '../types/family';
+import { birthYear } from './dates';
+
+export type PersonIndex = Map<string, FamilyPerson>;
+
+export function buildIndex(people: FamilyPerson[]): PersonIndex {
+  return new Map(people.map((p) => [p.id, p]));
+}
+
+/** People with no recorded parents whose spouses also have no recorded parents. */
+export function findFounders(people: FamilyPerson[]): FamilyPerson[] {
+  const index = buildIndex(people);
+  const founders = people.filter(
+    (p) =>
+      p.parentIds.length === 0 &&
+      (p.spouseIds.length === 0 ||
+        p.spouseIds.every((sid) => (index.get(sid)?.parentIds.length ?? 0) === 0)),
+  );
+  return founders.length > 0 ? founders : people.filter((p) => p.parentIds.length === 0);
+}
+
+/**
+ * Assign a generation number to every person. Founders are generation 1,
+ * children are one generation below their parents, and spouses share their
+ * partner's generation. Unreachable people default to generation 1.
+ */
+export function computeGenerations(people: FamilyPerson[]): Map<string, number> {
+  const index = buildIndex(people);
+  const generations = new Map<string, number>();
+  const queue: string[] = [];
+
+  for (const founder of findFounders(people)) {
+    if (!generations.has(founder.id)) {
+      generations.set(founder.id, 1);
+      queue.push(founder.id);
+    }
+  }
+
+  // No valid tree has more generations than people; the cap keeps a
+  // parent-child cycle in imported/remote data from looping forever.
+  const maxGen = Math.max(people.length, 1);
+
+  while (queue.length > 0) {
+    const id = queue.shift()!;
+    const person = index.get(id);
+    if (!person) continue;
+    const gen = generations.get(id)!;
+    for (const spouseId of person.spouseIds) {
+      // Spouses share the higher of the couple's generations, so a partner
+      // bumped later by a longer parent path drags the other one along.
+      if (index.has(spouseId) && (generations.get(spouseId) ?? 0) < gen) {
+        generations.set(spouseId, gen);
+        queue.push(spouseId);
+      }
+    }
+    for (const childId of person.childIds) {
+      if (index.has(childId)) {
+        const next = gen + 1;
+        if (next <= maxGen && (!generations.has(childId) || generations.get(childId)! < next)) {
+          generations.set(childId, next);
+          queue.push(childId);
+        }
+      }
+    }
+  }
+
+  for (const person of people) {
+    if (!generations.has(person.id)) generations.set(person.id, 1);
+  }
+  return generations;
+}
+
+/**
+ * Anchors to fold on a family's first view so a large tree opens compact
+ * instead of sprawling sideways. Every branch deeper than `openGenerations`
+ * whole generations is collapsed behind its nearest visible ancestor's ▸
+ * badge; the viewer expands the branches they care about. Only used to seed a
+ * brand-new browser — a saved collapse choice is always respected.
+ */
+export function defaultCollapsedIds(people: FamilyPerson[], openGenerations: number): string[] {
+  const generations = computeGenerations(people);
+  return people
+    .filter((p) => p.childIds.length > 0 && (generations.get(p.id) ?? 1) >= openGenerations)
+    .map((p) => p.id);
+}
+
+/** Ids of founders plus everyone descended from them ("blood line"). */
+export function computeBloodline(people: FamilyPerson[]): Set<string> {
+  const index = buildIndex(people);
+  const blood = new Set<string>();
+  const queue = findFounders(people).map((p) => p.id);
+  while (queue.length > 0) {
+    const id = queue.shift()!;
+    if (blood.has(id)) continue;
+    blood.add(id);
+    for (const childId of index.get(id)?.childIds ?? []) queue.push(childId);
+  }
+  return blood;
+}
+
+export function getDescendantIds(id: string, index: PersonIndex): Set<string> {
+  const result = new Set<string>();
+  const queue = [...(index.get(id)?.childIds ?? [])];
+  while (queue.length > 0) {
+    const next = queue.shift()!;
+    if (result.has(next)) continue;
+    result.add(next);
+    for (const childId of index.get(next)?.childIds ?? []) queue.push(childId);
+  }
+  return result;
+}
+
+export function getAncestorIds(id: string, index: PersonIndex): Set<string> {
+  const result = new Set<string>();
+  const queue = [...(index.get(id)?.parentIds ?? [])];
+  while (queue.length > 0) {
+    const next = queue.shift()!;
+    if (result.has(next)) continue;
+    result.add(next);
+    for (const parentId of index.get(next)?.parentIds ?? []) queue.push(parentId);
+  }
+  return result;
+}
+
+export interface RelationDescriptor {
+  marriedIn: boolean;
+  generation: number;
+}
+
+/**
+ * Language-neutral relationship to the original couple; the UI translates it
+ * (founder / child / grandchild / married-in) via the active language.
+ */
+export function relationshipDescriptor(
+  person: FamilyPerson,
+  generations: Map<string, number>,
+  bloodline: Set<string>,
+): RelationDescriptor {
+  return {
+    marriedIn: !bloodline.has(person.id),
+    generation: generations.get(person.id) ?? 1,
+  };
+}
+
+/** Best available name: "First Last", falling back to the nickname. */
+export function fullName(person: FamilyPerson): string {
+  const name = `${person.firstName} ${person.lastName}`.trim();
+  return name || person.nickname?.trim() || 'Unnamed';
+}
+
+export function displayName(person: FamilyPerson): string {
+  const name = `${person.firstName} ${person.lastName}`.trim();
+  if (!name) return person.nickname?.trim() || 'Unnamed';
+  return person.nickname
+    ? `${person.firstName} "${person.nickname}" ${person.lastName}`.trim()
+    : name;
+}
+
+export function initials(person: FamilyPerson): string {
+  const source = `${person.firstName} ${person.lastName}`.trim() || person.nickname?.trim() || '';
+  const parts = source.split(/\s+/).filter(Boolean).slice(0, 2);
+  const chars = parts.map((word) => word.charAt(0)).join('');
+  return chars.toUpperCase() || '?';
+}
+
+export function sortByBirth(a: FamilyPerson, b: FamilyPerson): number {
+  const ya = birthYear(a.birthDate) ?? 9999;
+  const yb = birthYear(b.birthDate) ?? 9999;
+  return ya - yb || a.firstName.localeCompare(b.firstName);
+}
+
+// ---------------------------------------------------------------------------
+// Pure mutation helpers. Every helper returns a NEW array and keeps both sides
+// of each relationship synchronized (spouse <-> spouse, parent <-> child).
+// ---------------------------------------------------------------------------
+
+function clone(person: FamilyPerson): FamilyPerson {
+  return {
+    ...person,
+    parentIds: [...person.parentIds],
+    spouseIds: [...person.spouseIds],
+    childIds: [...person.childIds],
+    divorcedIds: person.divorcedIds ? [...person.divorcedIds] : undefined,
+  };
+}
+
+/** Whether the couple is recorded as divorced (checks either side). */
+export function isDivorced(a: FamilyPerson, b: FamilyPerson): boolean {
+  return Boolean(a.divorcedIds?.includes(b.id) || b.divorcedIds?.includes(a.id));
+}
+
+/** The couple's marriage date, whichever partner's record carries it. */
+export function marriageDateOf(a: FamilyPerson, b: FamilyPerson): string | undefined {
+  return a.marriageDates?.[b.id] ?? b.marriageDates?.[a.id];
+}
+
+/** Set or clear (empty string) a couple's marriage date on one record. */
+export function withMarriageDate(
+  person: FamilyPerson,
+  spouseId: string,
+  date: string,
+): FamilyPerson {
+  const current = { ...(person.marriageDates ?? {}) };
+  if (date) current[spouseId] = date;
+  else delete current[spouseId];
+  return { ...person, marriageDates: Object.keys(current).length > 0 ? current : undefined };
+}
+
+/**
+ * Mirror `personId`'s marriage dates onto each of their spouses so both
+ * records agree — the database relationship row is derived from either side.
+ */
+export function syncMarriageDates(people: FamilyPerson[], personId: string): FamilyPerson[] {
+  const person = people.find((p) => p.id === personId);
+  if (!person) return people;
+  return people.map((p) => {
+    if (p.id === personId || !person.spouseIds.includes(p.id)) return p;
+    return withMarriageDate(p, personId, person.marriageDates?.[p.id] ?? '');
+  });
+}
+
+/** Mark or unmark a couple as divorced. They stay linked as (ex-)spouses. */
+export function setDivorced(
+  people: FamilyPerson[],
+  aId: string,
+  bId: string,
+  divorced: boolean,
+): FamilyPerson[] {
+  if (aId === bId) return people;
+  return people.map((p) => {
+    if (p.id !== aId && p.id !== bId) return p;
+    const otherId = p.id === aId ? bId : aId;
+    if (!p.spouseIds.includes(otherId)) return p;
+    const current = p.divorcedIds ?? [];
+    const next = divorced
+      ? addUnique(current, otherId)
+      : current.filter((id) => id !== otherId);
+    return { ...clone(p), divorcedIds: next.length > 0 ? next : undefined };
+  });
+}
+
+function addUnique(list: string[], id: string): string[] {
+  return list.includes(id) ? list : [...list, id];
+}
+
+export function linkSpouses(people: FamilyPerson[], aId: string, bId: string): FamilyPerson[] {
+  if (aId === bId) return people;
+  return people.map((p) => {
+    if (p.id === aId) return { ...clone(p), spouseIds: addUnique(p.spouseIds, bId) };
+    if (p.id === bId) return { ...clone(p), spouseIds: addUnique(p.spouseIds, aId) };
+    return p;
+  });
+}
+
+export function linkParentChild(
+  people: FamilyPerson[],
+  parentId: string,
+  childId: string,
+): FamilyPerson[] {
+  if (parentId === childId) return people;
+  return people.map((p) => {
+    if (p.id === parentId) return { ...clone(p), childIds: addUnique(p.childIds, childId) };
+    if (p.id === childId) return { ...clone(p), parentIds: addUnique(p.parentIds, parentId) };
+    return p;
+  });
+}
+
+/** Remove every reference to `id` from other people's relationship arrays. */
+export function stripReferences(people: FamilyPerson[], id: string): FamilyPerson[] {
+  return people.map((p) => {
+    if (!p.parentIds.includes(id) && !p.spouseIds.includes(id) && !p.childIds.includes(id)) {
+      return p;
+    }
+    const divorcedIds = p.divorcedIds?.filter((x) => x !== id);
+    return {
+      ...clone(p),
+      parentIds: p.parentIds.filter((x) => x !== id),
+      spouseIds: p.spouseIds.filter((x) => x !== id),
+      childIds: p.childIds.filter((x) => x !== id),
+      divorcedIds: divorcedIds?.length ? divorcedIds : undefined,
+    };
+  });
+}
+
+export function removePerson(people: FamilyPerson[], id: string): FamilyPerson[] {
+  return stripReferences(
+    people.filter((p) => p.id !== id),
+    id,
+  );
+}
+
+/**
+ * Replace a person's relationships with the given sets, updating the inverse
+ * side of every added or removed relationship.
+ */
+export function setRelationships(
+  people: FamilyPerson[],
+  personId: string,
+  parentIds: string[],
+  spouseIds: string[],
+): FamilyPerson[] {
+  const current = people.find((p) => p.id === personId);
+  if (!current) return people;
+
+  let next = people;
+  for (const oldParent of current.parentIds) {
+    if (!parentIds.includes(oldParent)) {
+      next = next.map((p) =>
+        p.id === oldParent
+          ? { ...clone(p), childIds: p.childIds.filter((x) => x !== personId) }
+          : p.id === personId
+            ? { ...clone(p), parentIds: p.parentIds.filter((x) => x !== oldParent) }
+            : p,
+      );
+    }
+  }
+  for (const oldSpouse of current.spouseIds) {
+    if (!spouseIds.includes(oldSpouse)) {
+      // Unlinking a spouse also clears any divorced marker on both sides.
+      next = next.map((p) => {
+        if (p.id !== oldSpouse && p.id !== personId) return p;
+        const removeId = p.id === oldSpouse ? personId : oldSpouse;
+        const divorcedIds = p.divorcedIds?.filter((x) => x !== removeId);
+        const stripped = withMarriageDate(clone(p), removeId, '');
+        return {
+          ...stripped,
+          spouseIds: p.spouseIds.filter((x) => x !== removeId),
+          divorcedIds: divorcedIds?.length ? divorcedIds : undefined,
+        };
+      });
+    }
+  }
+  for (const parentId of parentIds) next = linkParentChild(next, parentId, personId);
+  for (const spouseId of spouseIds) next = linkSpouses(next, personId, spouseId);
+  return next;
+}
+
+/** Attach a freshly created person to an existing one. */
+export function applyRelationLink(
+  people: FamilyPerson[],
+  newPersonId: string,
+  link: RelationLink,
+): FamilyPerson[] {
+  const target = people.find((p) => p.id === link.targetId);
+  if (!target) return people;
+  switch (link.kind) {
+    case 'spouse':
+      return linkSpouses(people, newPersonId, link.targetId);
+    case 'child': {
+      // Link to the target and to the chosen other parent. When no explicit
+      // choice was made, default to the target's first spouse; `null` means
+      // the child has only one recorded parent.
+      let next = linkParentChild(people, link.targetId, newPersonId);
+      const secondParentId =
+        link.secondParentId === undefined
+          ? target.spouseIds[0]
+          : (link.secondParentId ?? undefined);
+      if (secondParentId && secondParentId !== link.targetId) {
+        next = linkParentChild(next, secondParentId, newPersonId);
+      }
+      return next;
+    }
+    case 'parent':
+      return linkParentChild(people, newPersonId, link.targetId);
+    case 'sibling': {
+      let next = people;
+      for (const parentId of target.parentIds) {
+        next = linkParentChild(next, parentId, newPersonId);
+      }
+      return next;
+    }
+  }
+}
+
+/**
+ * Repair imported data: drop references to people who do not exist and make
+ * every relationship symmetric.
+ */
+export function normalizePeople(people: FamilyPerson[]): FamilyPerson[] {
+  const ids = new Set(people.map((p) => p.id));
+  let next: FamilyPerson[] = people.map((p) => {
+    const divorcedIds = [
+      ...new Set((p.divorcedIds ?? []).filter((id) => ids.has(id) && id !== p.id)),
+    ];
+    const marriageDates = Object.fromEntries(
+      Object.entries(p.marriageDates ?? {}).filter(([id]) => ids.has(id) && id !== p.id),
+    );
+    return {
+      ...clone(p),
+      parentIds: [...new Set(p.parentIds.filter((id) => ids.has(id) && id !== p.id))],
+      spouseIds: [...new Set(p.spouseIds.filter((id) => ids.has(id) && id !== p.id))],
+      childIds: [...new Set(p.childIds.filter((id) => ids.has(id) && id !== p.id))],
+      divorcedIds: divorcedIds.length > 0 ? divorcedIds : undefined,
+      marriageDates: Object.keys(marriageDates).length > 0 ? marriageDates : undefined,
+    };
+  });
+  const divorcedPairs = next.flatMap((p) =>
+    (p.divorcedIds ?? []).map((exId) => [p.id, exId] as const),
+  );
+  for (const person of next) {
+    for (const spouseId of person.spouseIds) next = linkSpouses(next, person.id, spouseId);
+    for (const childId of person.childIds) next = linkParentChild(next, person.id, childId);
+    for (const parentId of person.parentIds) next = linkParentChild(next, parentId, person.id);
+  }
+  // Divorce markers are symmetric (one side recording it is enough), and are
+  // applied only after every spouse link has been repaired — a marker whose
+  // spouse link was recorded on the OTHER person must survive too.
+  for (const [aId, bId] of divorcedPairs) next = setDivorced(next, aId, bId, true);
+  // Markers with no spouse link at all on either side are dropped.
+  return next.map((p) => {
+    const kept = (p.divorcedIds ?? []).filter((id) => p.spouseIds.includes(id));
+    if (kept.length === (p.divorcedIds ?? []).length) return p;
+    return { ...clone(p), divorcedIds: kept.length > 0 ? kept : undefined };
+  });
+}
+
+export function generatePersonId(
+  firstName: string,
+  lastName: string,
+  existing: Set<string>,
+): string {
+  const base =
+    `${firstName}-${lastName}`
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'person';
+  if (!existing.has(base)) return base;
+  let n = 2;
+  while (existing.has(`${base}-${n}`)) n += 1;
+  return `${base}-${n}`;
+}

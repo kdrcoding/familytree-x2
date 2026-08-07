@@ -1,0 +1,142 @@
+import { useMemo, useState } from 'react';
+import { Search, UserRoundPlus } from 'lucide-react';
+import type { FamilyPerson, RelationKind } from '../types/family';
+import { useFamily } from '../context/FamilyContext';
+import { useT } from '../i18n/useT';
+import { fullName, sortByBirth } from '../utils/family';
+import { Modal } from './ui/Modal';
+import { PersonFormModal } from './PersonFormModal';
+
+const KIND_KEYS = [
+  { kind: 'child', key: 'join.kindChild' },
+  { kind: 'spouse', key: 'join.kindSpouse' },
+  { kind: 'sibling', key: 'join.kindSibling' },
+  { kind: 'parent', key: 'join.kindParent' },
+] as const;
+
+interface JoinFamilyModalProps {
+  onClose: () => void;
+}
+
+/**
+ * Public "Add yourself" flow. Step 1 asks how the visitor connects; step 2
+ * is the person form, which submits a pending join request for the owner.
+ */
+export function JoinFamilyModal({ onClose }: JoinFamilyModalProps) {
+  const { people, getLabel } = useFamily();
+  const t = useT();
+  const [kind, setKind] = useState<RelationKind>('child');
+  const [targetId, setTargetId] = useState<string>('');
+  const [noConnection, setNoConnection] = useState(false);
+  const [step, setStep] = useState<1 | 2>(1);
+  const [query, setQuery] = useState('');
+
+  const candidates = useMemo(() => {
+    const sorted = [...people].sort(sortByBirth);
+    const q = query.trim().toLowerCase();
+    return q ? sorted.filter((p) => fullName(p).toLowerCase().includes(q)) : sorted;
+  }, [people, query]);
+
+  if (step === 2) {
+    return (
+      <PersonFormModal
+        selfJoin
+        link={noConnection || !targetId ? undefined : { kind, targetId }}
+        onBack={() => setStep(1)}
+        onClose={onClose}
+      />
+    );
+  }
+
+  return (
+    <Modal onClose={onClose} labelledBy="join-title" size="md">
+      <div className="flex items-start gap-3">
+        <span className="rounded-full bg-brand-100 p-2 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">
+          <UserRoundPlus className="h-5 w-5" aria-hidden />
+        </span>
+        <div>
+          <h2 id="join-title" className="text-lg font-semibold text-stone-900 dark:text-stone-100">
+            {t('join.title')}
+          </h2>
+          <p className="mt-1 text-sm text-stone-600 dark:text-stone-300">{t('join.intro')}</p>
+        </div>
+      </div>
+
+      <fieldset className="mt-4" disabled={noConnection}>
+        <legend className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">
+          {t('join.howRelated')}
+        </legend>
+        <select
+          className="input"
+          value={kind}
+          onChange={(e) => setKind(e.target.value as RelationKind)}
+          aria-label={t('join.kindLabel')}
+        >
+          {KIND_KEYS.map((k) => (
+            <option key={k.kind} value={k.kind}>
+              {t(k.key)}
+            </option>
+          ))}
+        </select>
+
+        <div className="mt-3 rounded-xl border border-stone-300 dark:border-stone-600">
+          <div className="flex items-center gap-2 border-b border-stone-200 px-3 py-2 dark:border-stone-700">
+            <Search className="h-3.5 w-3.5 text-stone-400" aria-hidden />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t('join.searchRelative')}
+              className="w-full bg-transparent text-sm outline-none placeholder:text-stone-400"
+              aria-label={t('join.searchLabel')}
+            />
+          </div>
+          <ul className="max-h-44 overflow-y-auto p-1">
+            {candidates.length === 0 && (
+              <li className="px-2 py-1.5 text-xs text-stone-400">{t('join.noMatches')}</li>
+            )}
+            {candidates.map((p: FamilyPerson) => (
+              <li key={p.id}>
+                <label className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-stone-100 dark:hover:bg-stone-800">
+                  <input
+                    type="radio"
+                    name="join-target"
+                    checked={targetId === p.id}
+                    onChange={() => setTargetId(p.id)}
+                    className="h-4 w-4 border-stone-300 text-brand-600 focus:ring-brand-500"
+                  />
+                  <span className="truncate">{fullName(p)}</span>
+                  <span className="ml-auto shrink-0 text-xs text-stone-400">{getLabel(p)}</span>
+                </label>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </fieldset>
+
+      <label className="mt-3 flex items-center gap-2 text-sm text-stone-600 dark:text-stone-300">
+        <input
+          type="checkbox"
+          checked={noConnection}
+          onChange={(e) => setNoConnection(e.target.checked)}
+          className="h-4 w-4 rounded border-stone-300 text-brand-600 focus:ring-brand-500"
+        />
+        {t('join.notSure')}
+      </label>
+
+      <div className="mt-5 flex justify-end gap-2">
+        <button type="button" className="btn-secondary" onClick={onClose}>
+          {t('common.cancel')}
+        </button>
+        <button
+          type="button"
+          className="btn-primary"
+          disabled={!noConnection && !targetId}
+          onClick={() => setStep(2)}
+        >
+          {t('join.continue')}
+        </button>
+      </div>
+    </Modal>
+  );
+}
