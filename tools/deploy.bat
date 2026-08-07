@@ -48,9 +48,22 @@ if "%choice%"=="1" set "also_github=1"
 
 :vercel
 echo Deploying to Vercel...
-echo (First time: it will ask you to log in and confirm the project - accept the defaults.)
-call npx vercel --prod
-if errorlevel 1 goto :fail
+echo (GitHub is connected — production deploys from main work best.)
+echo.
+rem Prefer a production deploy of the linked project. If the CLI upload is
+rem blocked (git author / team policy), fall back to pushing main so Vercel
+rem builds from GitHub instead.
+call npx vercel --prod --yes
+if errorlevel 1 (
+    echo.
+    echo CLI deploy was blocked or failed. Pushing main to GitHub so Vercel rebuilds...
+    git push origin main
+    if errorlevel 1 goto :fail
+    echo.
+    echo [DONE] Pushed to GitHub — Vercel will rebuild https://ravshanov-family.vercel.app
+    if "%also_github%"=="1" goto :end
+    goto :end
+)
 echo.
 echo [DONE] Deployed to Vercel!
 echo.

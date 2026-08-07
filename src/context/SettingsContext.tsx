@@ -29,7 +29,7 @@ function isSettings(value: unknown): value is AppSettings {
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = usePersistentState<AppSettings>(
     STORAGE_KEYS.settings,
-    { theme: 'dark', language: 'uz', privacy: DEFAULT_PRIVACY, easyMode: true },
+    { theme: 'dark', language: 'ru', privacy: DEFAULT_PRIVACY, easyMode: true },
     isSettings,
   );
 
@@ -44,7 +44,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       meta.name = 'theme-color';
       document.head.appendChild(meta);
     }
-    meta.content = settings.theme === 'dark' ? '#0c0a09' : '#ffffff';
+    meta.content = settings.theme === 'dark' ? '#082f49' : '#f0f9ff';
   }, [settings.theme]);
 
   useEffect(() => {

@@ -1,8 +1,7 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { ChevronDown, Languages, LogOut, Menu, Moon, Sun, X } from 'lucide-react';
+import { ChevronDown, Languages, Menu, Moon, Settings, Sun, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useConfirm } from '../context/ConfirmContext';
 import { useSettings } from '../context/SettingsContext';
 import { languageCodeLabel, nextLanguage } from '../types/family';
 import { useT } from '../i18n/useT';
@@ -10,21 +9,17 @@ import { MadeByKadir } from './MadeByKadir';
 import { BottomNav } from './BottomNav';
 import { PageSkeleton } from './PageSkeleton';
 import { WelcomeTour } from './WelcomeTour';
-import { OverflowMenu } from './OverflowMenu';
 import { BrandLogo } from './BrandLogo';
 
 export function Layout() {
   const { settings, toggleTheme, setLanguage } = useSettings();
-  const { role, signOut } = useAuth();
-  const confirm = useConfirm();
+  const { role } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const t = useT();
   const isTreePage = location.pathname === '/tree';
-  // Keep the shared family experience simple. The owner always gets the
-  // complete navigation and administrative surface.
   const easy = role !== 'owner' && Boolean(settings.easyMode);
 
   useEffect(() => {
@@ -50,26 +45,16 @@ export function Layout() {
     };
   }, [moreOpen]);
 
-  const handleSignOut = async () => {
-    const proceed = await confirm({
-      title: t('nav.signOutConfirmTitle'),
-      message: t('nav.signOutConfirmMsg'),
-      confirmLabel: t('nav.signOut'),
-    });
-    if (proceed) signOut();
-  };
-
   const cycleLanguage = () => setLanguage(nextLanguage(settings.language));
 
-  // Primary destinations — keep the top bar short and clear.
+  // Compact primary: Home / Tree / Members — Settings is the gear icon.
   const primaryNav = [
     { to: '/', label: t('nav.home') },
     { to: '/tree', label: t('nav.tree') },
     { to: '/members', label: t('nav.members') },
-    { to: '/settings', label: t('nav.settings') },
   ];
 
-  // Extra pages live under More / the phone menu.
+  // Secondary pages under More (map/stats/about stay out of easy mode).
   const moreNav = [
     { to: '/related', label: t('nav.related'), easy: true },
     { to: '/timeline', label: t('nav.timeline'), easy: true },
@@ -78,21 +63,25 @@ export function Layout() {
     { to: '/about', label: t('nav.about'), easy: false },
   ].filter((item) => !easy || item.easy);
 
-  const mobileNav = [...primaryNav, ...moreNav];
+  const mobileNav = [
+    ...primaryNav,
+    { to: '/settings', label: t('nav.settings') },
+    ...moreNav,
+  ];
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
-    `rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+    `rounded-lg px-2.5 py-1.5 text-sm font-medium transition-colors ${
       isActive
         ? 'bg-brand-100 text-brand-900 dark:bg-brand-900/40 dark:text-brand-200'
         : 'text-stone-700 hover:bg-stone-100 hover:text-stone-900 dark:text-stone-200 dark:hover:bg-stone-800 dark:hover:text-stone-100'
     }`;
 
-  const langTitle =
-    settings.language === 'uz'
-      ? 'Switch to English'
-      : settings.language === 'en'
-        ? 'Переключить на русский'
-        : "O'zbekchaga o'tish";
+  const iconBtnClass = ({ isActive }: { isActive: boolean }) =>
+    `icon-btn !min-h-10 !min-w-10 ${
+      isActive
+        ? 'bg-brand-100 text-brand-800 dark:bg-brand-900/50 dark:text-brand-200'
+        : ''
+    }`;
 
   return (
     <div className="flex min-h-dvh flex-col bg-stone-100 text-stone-900 dark:bg-stone-950 dark:text-stone-100">
@@ -102,14 +91,20 @@ export function Layout() {
       >
         {t('nav.skip')}
       </a>
-      <header className="sticky top-0 z-40 border-b border-stone-200 bg-white/85 backdrop-blur dark:border-stone-800 dark:bg-stone-950/85">
-        <div className="mx-auto flex h-14 max-w-7xl items-center gap-2 px-3 sm:h-16 sm:gap-3 sm:px-6">
+      <header className="sticky top-0 z-40 border-b border-stone-200 bg-white/90 backdrop-blur dark:border-stone-800 dark:bg-stone-950/90">
+        <div className="mx-auto flex h-12 max-w-7xl items-center gap-1.5 px-3 sm:h-14 sm:gap-2 sm:px-5">
           <NavLink
             to="/"
             className="flex min-w-0 items-center gap-2"
             onClick={() => setMenuOpen(false)}
           >
-            <BrandLogo size="sm" />
+            {/* Mark always; wordmark from sm up — keeps the bar compact on phones */}
+            <span className="sm:hidden">
+              <BrandLogo size="sm" wordmark={false} />
+            </span>
+            <span className="hidden sm:inline-flex">
+              <BrandLogo size="sm" />
+            </span>
           </NavLink>
 
           <nav className="ml-auto hidden items-center gap-0.5 lg:flex" aria-label={t('nav.mainNav')}>
@@ -130,13 +125,13 @@ export function Layout() {
                   <ChevronDown className="ml-0.5 inline h-4 w-4" aria-hidden />
                 </button>
                 {moreOpen && (
-                  <ul className="absolute right-0 z-50 mt-1 min-w-[11rem] overflow-hidden rounded-2xl border border-stone-200 bg-white py-1 shadow-xl dark:border-stone-700 dark:bg-stone-900">
+                  <ul className="absolute right-0 z-50 mt-1 min-w-[11rem] overflow-hidden rounded-xl border border-stone-200 bg-white py-1 shadow-lg dark:border-stone-700 dark:bg-stone-900">
                     {moreNav.map((item) => (
                       <li key={item.to}>
                         <NavLink
                           to={item.to}
                           className={({ isActive }) =>
-                            `block px-4 py-2.5 text-sm font-semibold ${
+                            `block px-3.5 py-2 text-sm font-medium ${
                               isActive
                                 ? 'bg-brand-50 text-brand-900 dark:bg-brand-950/50 dark:text-brand-200'
                                 : 'text-stone-800 hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-stone-800'
@@ -154,67 +149,67 @@ export function Layout() {
             )}
           </nav>
 
-          <div className="ml-auto flex items-center gap-0.5 lg:ml-4">
-            <OverflowMenu
-              label={t('nav.more')}
-              items={[
-                {
-                  id: 'lang',
-                  label: `${t('nav.language')}: ${languageCodeLabel(settings.language)}`,
-                  icon: <Languages className="h-4 w-4" aria-hidden />,
-                  onClick: cycleLanguage,
-                },
-                {
-                  id: 'theme',
-                  label: settings.theme === 'dark' ? t('nav.themeLight') : t('nav.themeDark'),
-                  icon:
-                    settings.theme === 'dark' ? (
-                      <Sun className="h-4 w-4" aria-hidden />
-                    ) : (
-                      <Moon className="h-4 w-4" aria-hidden />
-                    ),
-                  onClick: toggleTheme,
-                },
-                {
-                  id: 'signout',
-                  label: t('nav.signOut'),
-                  icon: <LogOut className="h-4 w-4" aria-hidden />,
-                  onClick: () => void handleSignOut(),
-                  danger: true,
-                },
-              ]}
-            />
+          <div className="ml-auto flex items-center gap-0.5 lg:ml-2">
             <button
               type="button"
-              className="icon-btn !min-h-11 !gap-1 !px-2.5 text-sm font-bold lg:hidden"
+              className="icon-btn !min-h-10 !min-w-10 !gap-0.5 text-xs font-bold"
+              onClick={cycleLanguage}
+              title={t('nav.langCycle')}
+              aria-label={t('nav.langCycle')}
+            >
+              <Languages className="h-4 w-4" aria-hidden />
+              <span className="tabular-nums">{languageCodeLabel(settings.language)}</span>
+            </button>
+            <button
+              type="button"
+              className="icon-btn !min-h-10 !min-w-10"
+              onClick={toggleTheme}
+              title={settings.theme === 'dark' ? t('nav.themeLight') : t('nav.themeDark')}
+              aria-label={settings.theme === 'dark' ? t('nav.themeLight') : t('nav.themeDark')}
+            >
+              {settings.theme === 'dark' ? (
+                <Sun className="h-5 w-5" aria-hidden />
+              ) : (
+                <Moon className="h-5 w-5" aria-hidden />
+              )}
+            </button>
+            <NavLink
+              to="/settings"
+              className={iconBtnClass}
+              title={t('nav.settings')}
+              aria-label={t('nav.settings')}
+              onClick={() => setMenuOpen(false)}
+            >
+              <Settings className="h-5 w-5" aria-hidden />
+            </NavLink>
+            <button
+              type="button"
+              className="icon-btn !min-h-10 !min-w-10 lg:hidden"
               onClick={() => setMenuOpen((open) => !open)}
               aria-expanded={menuOpen}
               aria-label={menuOpen ? t('nav.menuClose') : t('nav.menuOpen')}
             >
-              {menuOpen ? <X className="h-6 w-6" aria-hidden /> : <Menu className="h-6 w-6" aria-hidden />}
-              <span className="hidden sm:inline sm:pr-0.5">
-                {menuOpen ? t('nav.menuCloseShort') : t('nav.menu')}
-              </span>
+              {menuOpen ? <X className="h-5 w-5" aria-hidden /> : <Menu className="h-5 w-5" aria-hidden />}
             </button>
           </div>
         </div>
 
         {menuOpen && (
           <nav
-            className="animate-fade-in border-t border-stone-200 bg-white px-3 py-3 lg:hidden dark:border-stone-800 dark:bg-stone-950"
+            className="animate-fade-in border-t border-stone-200 bg-white px-3 py-2 lg:hidden dark:border-stone-800 dark:bg-stone-950"
             aria-label={t('nav.mobileNav')}
           >
-            <ul className="flex flex-col gap-1">
+            <ul className="flex flex-col gap-0.5">
               {mobileNav.map((item) => (
                 <li key={item.to}>
                   <NavLink
                     to={item.to}
                     end={item.to === '/'}
                     className={({ isActive }) =>
-                      `block w-full rounded-2xl px-4 py-3.5 text-lg font-semibold transition-colors ${
+                      `block w-full rounded-xl px-3.5 py-2.5 text-base font-semibold transition-colors ${
                         isActive
                           ? 'bg-brand-100 text-brand-900 dark:bg-brand-900/40 dark:text-brand-200'
-                          : 'bg-stone-50 text-stone-800 hover:bg-stone-100 dark:bg-stone-900 dark:text-stone-100 dark:hover:bg-stone-800'
+                          : 'text-stone-800 hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-stone-800'
                       }`
                     }
                     onClick={() => setMenuOpen(false)}
@@ -224,22 +219,17 @@ export function Layout() {
                 </li>
               ))}
             </ul>
-            <p className="sr-only">{langTitle}</p>
           </nav>
         )}
       </header>
 
-      <div
-        id="main"
-        tabIndex={-1}
-        className={`flex flex-1 flex-col outline-none $'pb-20 lg:pb-0'`}
-      >
+      <div id="main" tabIndex={-1} className="flex flex-1 flex-col outline-none pb-20 lg:pb-0">
         <Suspense fallback={<PageSkeleton />}>
           <Outlet />
         </Suspense>
         {!isTreePage && (
-          <footer className="mt-auto border-t border-stone-200 px-4 py-6 dark:border-stone-800">
-            <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 sm:flex-row sm:justify-between">
+          <footer className="mt-auto border-t border-stone-200 px-4 py-4 dark:border-stone-800">
+            <div className="mx-auto flex max-w-7xl flex-col items-center gap-2 sm:flex-row sm:justify-between">
               <p className="text-center text-xs text-stone-500 dark:text-stone-400 sm:text-left">
                 {t('footer.note')}
               </p>

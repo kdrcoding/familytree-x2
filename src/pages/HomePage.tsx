@@ -111,32 +111,32 @@ export function HomePage() {
           </svg>
         </div>
 
-        <div className="relative mx-auto max-w-3xl px-5 pb-14 pt-10 sm:px-8 sm:pb-18 sm:pt-14">
+        <div className="relative mx-auto max-w-3xl px-5 pb-10 pt-8 sm:px-8 sm:pb-14 sm:pt-12">
           <div className="home-hero__mark">
-            <BrandMark size="lg" title={t('site.title')} className="!h-[4.5rem] !w-[4.5rem] !rounded-[1.25rem] shadow-lg ring-1 ring-brand-900/10 dark:ring-white/10" />
+            <BrandMark size="lg" title={t('site.title')} className="!h-14 !w-14 !rounded-xl shadow-lg ring-1 ring-brand-900/10 sm:!h-[4.5rem] sm:!w-[4.5rem] sm:!rounded-[1.25rem] dark:ring-white/10" />
           </div>
 
-          <p className="home-hero__kicker mt-6 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-brand-700/80 dark:text-brand-200/80 sm:text-xs">
+          <p className="home-hero__kicker mt-4 text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-brand-700/80 dark:text-brand-200/80 sm:mt-6 sm:text-xs">
             {t('home.kicker')}
           </p>
 
           <h1
             id="home-brand"
-            className="home-hero__title mt-3 font-display text-[2.15rem] font-semibold leading-[1.1] tracking-tight text-brand-950 dark:text-white sm:text-5xl"
+            className="home-hero__title mt-2 font-display text-[1.85rem] font-semibold leading-[1.1] tracking-tight text-brand-950 dark:text-white sm:mt-3 sm:text-5xl"
           >
             {t('site.title')}
           </h1>
 
-          <p className="home-hero__intro mt-4 max-w-xl text-base leading-relaxed text-brand-900/80 dark:text-stone-200/90 sm:text-lg">
+          <p className="home-hero__intro mt-3 max-w-xl text-base leading-relaxed text-brand-900/80 dark:text-stone-200/90 sm:mt-4 sm:text-lg">
             {easy ? t('home.introEasy') : t('home.intro')}
           </p>
 
-          <div className="home-hero__search relative z-20 mt-8 max-w-lg">
+          <div className="home-hero__search relative z-20 mt-6 max-w-lg sm:mt-8">
             <p className="mb-2 text-sm font-medium text-brand-800/80 dark:text-brand-100/80">{t('home.searchTitle')}</p>
             <PersonSearch large placeholder={t('home.searchPlaceholder')} />
           </div>
 
-          <div className="home-hero__actions mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="home-hero__actions mt-4 flex flex-col gap-2.5 sm:mt-6 sm:flex-row sm:items-center">
             <Link
               to="/tree"
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-800 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-brand-950/25 transition-all hover:bg-brand-700 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-100 dark:bg-white dark:text-brand-950 dark:shadow-brand-950/20 dark:hover:bg-brand-50 dark:focus-visible:ring-white dark:focus-visible:ring-offset-brand-950 active:translate-y-0"

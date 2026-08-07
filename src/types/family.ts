@@ -58,9 +58,10 @@ export interface PrivacySettings {
 
 export type AppLanguage = 'uz' | 'en' | 'ru';
 
-export const APP_LANGUAGES: AppLanguage[] = ['uz', 'en', 'ru'];
+/** Russian first — Shajira default. Cycle RU → EN → UZ → RU. */
+export const APP_LANGUAGES: AppLanguage[] = ['ru', 'en', 'uz'];
 
-/** Cycle UZ → EN → RU → UZ. */
+/** Cycle RU → EN → UZ → RU. */
 export function nextLanguage(current: AppLanguage): AppLanguage {
   const i = APP_LANGUAGES.indexOf(current);
   return APP_LANGUAGES[(i < 0 ? 0 : i + 1) % APP_LANGUAGES.length];
@@ -72,12 +73,12 @@ export function languageCodeLabel(language: AppLanguage): string {
 
 export function normalizeLanguage(value: unknown): AppLanguage {
   if (value === 'en' || value === 'ru' || value === 'uz') return value;
-  return 'uz';
+  return 'ru';
 }
 
 export interface AppSettings {
   theme: Theme;
-  /** UI language. Uzbek is the default; English is the second option. */
+  /** UI language. Russian is the default for Shajira. */
   language: AppLanguage;
   privacy: PrivacySettings;
   /**
