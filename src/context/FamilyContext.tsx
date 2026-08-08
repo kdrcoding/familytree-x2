@@ -43,7 +43,11 @@ interface FamilyContextValue {
   /** Create a person, optionally attached to an existing relative. */
   addPerson: (person: FamilyPerson, link?: RelationLink) => Promise<boolean>;
   /** Update fields and replace the person's parent/spouse relationships. */
-  updatePerson: (person: FamilyPerson, parentIds: string[], spouseIds: string[]) => void;
+  updatePerson: (
+    person: FamilyPerson,
+    parentIds: string[],
+    spouseIds: string[],
+  ) => Promise<boolean>;
   /** Mark or unmark a couple as divorced (they stay linked as ex-spouses). */
   setDivorcedStatus: (aId: string, bId: string, divorced: boolean) => void;
   deletePerson: (id: string) => Promise<boolean>;
@@ -275,7 +279,7 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
         }, 'add');
       },
       updatePerson: (person, parentIds, spouseIds) => {
-        void mutate((current) => {
+        return mutate((current) => {
           const existing = current.find((p) => p.id === person.id);
           if (!existing) return current;
           if (!isOwner) {

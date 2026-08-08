@@ -230,12 +230,12 @@ function TreeCanvas({
   useEffect(() => {
     if (!focusId) return;
     const node = nodes.find((n) => n.id === focusId);
-    if (node) {
-      setCenter(node.position.x + CARD_W / 2, node.position.y + CARD_H / 2, {
-        zoom: Math.max(getZoom(), focusZoom),
-        duration: 600,
-      });
-    }
+    // Keep focusId until the node is on the canvas (e.g. after revealPath expands).
+    if (!node) return;
+    setCenter(node.position.x + CARD_W / 2, node.position.y + CARD_H / 2, {
+      zoom: Math.max(getZoom(), focusZoom),
+      duration: 600,
+    });
     onFocused();
   }, [focusId, nodes, setCenter, getZoom, focusZoom, onFocused]);
 
@@ -269,8 +269,10 @@ function TreeCanvas({
       nodesConnectable={false}
       nodesFocusable={false}
       edgesFocusable={false}
+      preventScrolling
       zoomOnDoubleClick={false}
       zoomOnScroll
+      zoomOnPinch
       panOnScroll={false}
       panOnDrag
       proOptions={{ hideAttribution: true }}
@@ -371,7 +373,7 @@ function TreeCanvas({
       <Controls
         showInteractive={false}
         position="bottom-right"
-        className={`family-tree-controls !mb-[4.5rem] !mr-1.5 overflow-hidden rounded-xl border border-stone-200/90 shadow-md sm:!mb-16 sm:!mr-2 lg:!mb-3 lg:!mr-3 ${easyMode ? 'tree-controls-easy' : ''}`}
+        className={`family-tree-controls !mr-1.5 overflow-hidden rounded-xl border border-stone-200/90 shadow-md sm:!mr-2 lg:!mr-3 ${easyMode ? 'tree-controls-easy' : ''}`}
       />
     </ReactFlow>
   );
@@ -404,7 +406,7 @@ export function TreePage() {
   );
   const collapsed = useMemo(() => new Set(collapsedList), [collapsedList]);
 
-  const [editMode, setEditMode] = useState(canEdit);
+  const [editMode, setEditMode] = useState(false);
   const [unlockOpen, setUnlockOpen] = useState(false);
   const [joinOpen, setJoinOpen] = useState(false);
   const [detailsId, setDetailsId] = useState<string | null>(null);
@@ -412,11 +414,17 @@ export function TreePage() {
   const [form, setForm] = useState<{ person?: FamilyPerson; link?: RelationLink } | null>(null);
   const [focusId, setFocusId] = useState<string | null>(null);
   const [exportBusy, setExportBusy] = useState(false);
+  const clearFocus = useCallback(() => setFocusId(null), []);
 
   useEffect(() => {
-    // Password gate already signed them in — edit tools are ready right away.
-    setEditMode(canEdit);
+    // Keep browse mode calm after login; turn edit tools off if they lose access.
+    if (!canEdit) setEditMode(false);
   }, [canEdit]);
+
+  // Drop stale details if the person was deleted / removed by live sync.
+  useEffect(() => {
+    if (detailsId && !index.get(detailsId)) setDetailsId(null);
+  }, [detailsId, index]);
 
   // Invite / join deep link: ?join=1 or ?invite=1 opens Add yourself.
   useEffect(() => {
@@ -508,7 +516,11 @@ export function TreePage() {
   const appliedParamRef = useRef<string | null>(null);
   useEffect(() => {
     const personParam = searchParams.get('person');
-    if (!personParam || appliedParamRef.current === personParam) return;
+    if (!personParam) {
+      appliedParamRef.current = null;
+      return;
+    }
+    if (appliedParamRef.current === personParam) return;
     const person = index.get(personParam);
     if (person) {
       appliedParamRef.current = personParam;
@@ -517,6 +529,17 @@ export function TreePage() {
       setDetailsId(person.id);
     }
   }, [searchParams, index, revealPath]);
+
+  const closeDetails = useCallback(() => {
+    setDetailsId(null);
+    // Allow the same ?person= link to reopen details later in this session.
+    appliedParamRef.current = null;
+    if (searchParams.get('person')) {
+      const next = new URLSearchParams(searchParams);
+      next.delete('person');
+      setSearchParams(next, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // Copy a share link for one person; opening it reopens that person.
   const copyPersonLink = useCallback(
@@ -544,10 +567,10 @@ export function TreePage() {
       if (!proceed) return;
       const saved = await deletePerson(person.id);
       if (!saved) return;
-      setDetailsId(null);
+      closeDetails();
       toast(t('delete.done', { name: fullName(person) }));
     },
-    [confirm, deletePerson, toast, t],
+    [confirm, deletePerson, toast, t, closeDetails],
   );
 
   const requestEdit = (person: FamilyPerson) => {
@@ -642,7 +665,7 @@ export function TreePage() {
         </div>
       </div>
 
-      <div className="relative min-h-0 flex-1" style={{ minHeight: 'calc(100dvh - 10.5rem)' }}>
+      <div className="relative min-h-0 flex-1 overflow-hidden">
         <div className="absolute inset-0 bg-[var(--shajira-page,#e7e5e4)] dark:bg-stone-950">
           <TreeInteractionContext.Provider value={interaction}>
             <ReactFlowProvider>
@@ -650,7 +673,7 @@ export function TreePage() {
                 nodes={flowNodes}
                 edges={layout.edges}
                 focusId={focusId}
-                onFocused={() => setFocusId(null)}
+                onFocused={clearFocus}
                 easyMode={easy}
               />
             </ReactFlowProvider>
@@ -660,7 +683,7 @@ export function TreePage() {
         {editMode && (
           <button
             type="button"
-            className="btn-primary fixed bottom-[4.75rem] right-3 z-30 !min-h-12 !min-w-12 rounded-full shadow-lg shadow-brand-900/25 sm:hidden"
+            className="tree-add-fab btn-primary !min-h-12 !min-w-12 rounded-full shadow-lg shadow-brand-900/25 sm:hidden"
             onClick={() => setForm({})}
             aria-label={t('tree.addPerson')}
           >
@@ -672,13 +695,13 @@ export function TreePage() {
       {detailsId && (
         <PersonDetailsModal
           personId={detailsId}
-          onClose={() => setDetailsId(null)}
+          onClose={closeDetails}
           onNavigate={(id) => setDetailsId(id)}
           // Editors get Edit without turning on tree Edit Mode; delete stays owner-only.
           editMode={canEdit}
           canDelete={canDelete}
           onEdit={(person) => {
-            setDetailsId(null);
+            closeDetails();
             setForm({ person });
           }}
           onDelete={handleDelete}

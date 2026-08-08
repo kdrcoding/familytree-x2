@@ -26,8 +26,8 @@ interface PersonFormModalProps {
   /** When creating, optionally attach the new person to an existing one. */
   link?: RelationLink;
   /**
-   * "Add yourself" mode: submits a pending join request for the owner to
-   * approve — the person is not added to the live tree until then.
+   * "Add yourself" mode: same form, copy/labels for joining the tree.
+   * Saves onto the live tree immediately (no owner approval step).
    */
   selfJoin?: boolean;
   /** Return to the previous step of a multi-step creation flow. */
@@ -280,7 +280,7 @@ function PeoplePicker({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t('form.searchIn', { label })}
-            className="w-full bg-transparent text-sm outline-none placeholder:text-stone-400"
+            className="w-full bg-transparent text-base outline-none placeholder:text-stone-400"
           />
         </div>
         <ul className="max-h-36 overflow-y-auto p-1">
@@ -588,7 +588,7 @@ export function PersonFormModal({
         const date = (marriageDates[spouseId] ?? '').trim();
         if (date) cleanedMarriage[spouseId] = date;
       }
-      updatePerson(
+      const saved = await updatePerson(
         {
           ...person,
           ...trimmed,
@@ -597,6 +597,7 @@ export function PersonFormModal({
         parentIds,
         spouseIds,
       );
+      if (!saved) return false;
       toast(t('form.updatedToast', { name: personLabel }));
       onSaved?.(person.id);
     } else {

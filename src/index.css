@@ -110,6 +110,12 @@
     -webkit-overflow-scrolling: touch;
   }
 
+  :root {
+    /* Bottom tab bar ≈ 44px content + safe-area (notched iPhones). */
+    --bottom-nav-h: calc(3.25rem + env(safe-area-inset-bottom, 0px));
+    --safe-top: env(safe-area-inset-top, 0px);
+  }
+
   /* Honour the OS "reduce motion" setting: strip animations and transitions
      for users who get motion sickness or simply prefer a calmer UI. */
   @media (prefers-reduced-motion: reduce) {
@@ -242,9 +248,9 @@ html:not(.dark) .border-stone-300 {
     @apply p-3 sm:p-2.5;
   }
 
-  /* Bigger on touch screens — 24px circles are too small for fingers. */
+  /* Bigger on phones — 44px targets for fingers; slightly smaller on desktop. */
   .quick-add {
-    @apply flex h-9 w-9 items-center justify-center rounded-full border border-brand-300 bg-white text-brand-700 shadow-md transition-transform hover:scale-110 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 sm:h-7 sm:w-7 dark:border-brand-700 dark:bg-stone-800 dark:text-brand-300 dark:hover:bg-stone-700;
+    @apply flex h-11 w-11 items-center justify-center rounded-full border border-brand-300 bg-white text-brand-700 shadow-md transition-transform hover:scale-110 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 sm:h-7 sm:w-7 dark:border-brand-700 dark:bg-stone-800 dark:text-brand-300 dark:hover:bg-stone-700;
   }
 
   .icon-btn {
@@ -365,11 +371,11 @@ html:not(.dark) .border-stone-300 {
 
 /* —— Tree search refinement —— */
 .tree-search-input {
-  @apply w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-base text-stone-900 shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20 sm:py-2 sm:text-sm dark:border-stone-600 dark:bg-stone-800/80 dark:text-stone-100 dark:placeholder:text-stone-500 dark:focus:border-brand-500;
+  @apply w-full rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-base text-stone-900 shadow-sm outline-none transition-all placeholder:text-stone-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-500/20 dark:border-stone-600 dark:bg-stone-800/80 dark:text-stone-100 dark:placeholder:text-stone-500 dark:focus:border-brand-500;
 }
 
 .tree-search-dropdown {
-  @apply absolute z-30 mt-1.5 max-h-80 w-full overflow-y-auto rounded-xl border border-stone-200 bg-white p-1.5 shadow-lg shadow-stone-900/6 dark:border-stone-700 dark:bg-stone-900 dark:shadow-black/30;
+  @apply absolute z-50 mt-1.5 max-h-80 w-full overflow-y-auto rounded-xl border border-stone-200 bg-white p-1.5 shadow-lg shadow-stone-900/6 dark:border-stone-700 dark:bg-stone-900 dark:shadow-black/30;
 }
 
 .tree-search-result {
@@ -383,6 +389,10 @@ html:not(.dark) .border-stone-300 {
 .family-tree-canvas .react-flow__renderer,
 .family-tree-canvas .react-flow__pane {
   cursor: grab;
+  /* Keep iOS from stealing pan/pinch as page scroll or browser zoom. */
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 .family-tree-canvas .react-flow__pane:active {
   cursor: grabbing;
@@ -391,6 +401,21 @@ html:not(.dark) .border-stone-300 {
 .family-tree-controls {
   background: rgb(255 255 255 / 0.95) !important;
   box-shadow: 0 4px 14px rgb(28 25 23 / 0.08) !important;
+  /* Sit above the bottom tab bar on phones. */
+  margin-bottom: calc(var(--bottom-nav-h) + 0.5rem) !important;
+}
+@media (min-width: 1024px) {
+  .family-tree-controls {
+    margin-bottom: 0.75rem !important;
+  }
+}
+
+/* Phone add-person FAB — left of zoom controls, clear of the tab bar. */
+.tree-add-fab {
+  position: absolute;
+  z-index: 30;
+  right: 4.25rem;
+  bottom: calc(var(--bottom-nav-h) + 0.75rem);
 }
 .family-tree-controls .react-flow__controls-button {
   background: transparent;
@@ -581,6 +606,40 @@ html:not(.dark) .home-hero__pedigree {
   @apply rounded-2xl border border-stone-200/80 bg-[var(--shajira-card,#ffffff)] shadow-[0_1px_3px_0_rgb(0_0_0_0.06)] dark:border-stone-700/80 dark:bg-stone-900/95 dark:shadow-[0_1px_3px_0_rgb(0_0_0_0.20)];
 }
 
+/* Birthday rows — date chip + clearer today highlight */
+.home-bday-row {
+  @apply flex items-center gap-3 rounded-xl px-3 py-3 transition-all duration-150 hover:bg-[var(--shajira-lift,#fafaf9)] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500 sm:px-4 dark:hover:bg-stone-800/60;
+}
+.home-bday-today {
+  @apply bg-brand-50/90 ring-1 ring-brand-200/80 hover:bg-brand-50 dark:bg-brand-950/35 dark:ring-brand-800/60 dark:hover:bg-brand-950/50;
+}
+.home-bday-date {
+  @apply flex h-12 w-11 shrink-0 flex-col items-center justify-center rounded-xl border border-stone-200/90 bg-white text-center shadow-sm dark:border-stone-700 dark:bg-stone-900;
+}
+.home-bday-today .home-bday-date {
+  @apply border-brand-300/80 bg-brand-100/80 dark:border-brand-700 dark:bg-brand-950/80;
+}
+.home-bday-date__month {
+  @apply text-[0.6rem] font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400;
+}
+.home-bday-date__day {
+  @apply font-display text-lg font-bold leading-none tabular-nums text-stone-900 dark:text-stone-50;
+}
+.home-bday-when {
+  @apply shrink-0 rounded-full bg-stone-100 px-2.5 py-1 text-xs font-semibold tabular-nums text-stone-600 dark:bg-stone-800 dark:text-stone-400;
+}
+.home-bday-when--today {
+  @apply bg-brand-600 text-white dark:bg-brand-500 dark:text-brand-950;
+}
+
+/* How-to illustrated panels */
+.home-guide-mock {
+  @apply aspect-[16/9] w-full overflow-hidden rounded-xl border border-stone-200/80 bg-gradient-to-br from-stone-50 to-brand-50/40 text-stone-400 dark:border-stone-700 dark:from-stone-900 dark:to-brand-950/30 dark:text-stone-500;
+}
+.home-guide-action {
+  @apply inline-flex min-h-10 items-center justify-center rounded-lg bg-brand-700 px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:bg-brand-600 dark:hover:bg-brand-500;
+}
+
 /* Home list items — hover-lift for interactive rows */
 .home-list-item {
   @apply flex items-center gap-3 rounded-xl px-3 py-3 transition-all duration-150 hover:bg-[var(--shajira-lift,#fafaf9)] hover:shadow-sm hover:-translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500 sm:px-4 dark:hover:bg-stone-800/60;
@@ -588,7 +647,7 @@ html:not(.dark) .home-hero__pedigree {
 
 /* Stat card in the mini dashboard */
 .home-stat-card {
-  @apply rounded-xl border border-stone-200/70 bg-[var(--shajira-lift,#ffffff)] p-4 shadow-[0_1px_2px_0_rgb(0_0_0_0.04)] dark:border-stone-700/70 dark:bg-stone-900/90;
+  @apply rounded-xl border border-stone-200/60 bg-[var(--shajira-lift,#ffffff)]/80 p-3.5 shadow-[0_1px_2px_0_rgb(0_0_0_0.03)] dark:border-stone-700/60 dark:bg-stone-900/70;
 }
 
 @keyframes home-rise {

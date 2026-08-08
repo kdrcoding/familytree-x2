@@ -73,7 +73,7 @@ export function AppLockGate({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-[var(--shajira-page,#e7e5e4)] px-4 py-10 text-stone-900 dark:bg-stone-950 dark:text-stone-100">
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-[var(--shajira-page,#e7e5e4)] px-4 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-[max(2.5rem,env(safe-area-inset-top))] text-stone-900 dark:bg-stone-950 dark:text-stone-100">
       {!ready ? (
         <Loader2 className="h-8 w-8 animate-spin text-brand-600" aria-hidden />
       ) : needsName ? (

@@ -147,6 +147,7 @@ export const en = {
   'home.born': 'Born {date}',
   'home.birthdaysTitle': 'Birthdays',
   'home.bdaysNone': 'No birthdays in the next {days} days.',
+  'home.bdayEmpty': 'No birthdays coming up in the next {days} days. Add birth dates on people’s profiles to see them here.',
   'home.annivTitle': 'Wedding anniversaries',
   'home.annivYears': '{n} years together',
   'home.annivYearsToday': '{n} years together today',
@@ -163,6 +164,19 @@ export const en = {
   'home.downloadCalendar': 'Add to my calendar',
   'home.calendarDownloaded':
     'Calendar file downloaded — open it on your phone to get yearly birthday and anniversary reminders.',
+  'home.guideTitle': 'How to use',
+  'home.guideIntro': 'Four short steps — everything starts from the family tree.',
+  'home.guideStep': 'Step {n}',
+  'home.guideStep1Title': 'Open the tree',
+  'home.guideStep1Text': 'See the whole family on one screen. Pinch to zoom, drag to move around.',
+  'home.guideStep2Title': 'Find someone',
+  'home.guideStep2Text': 'Type a name in search on Home or on the Tree page to jump straight to them.',
+  'home.guideStep3Title': 'Edit or add people',
+  'home.guideStep3Text': 'Tap Edit on the tree, then open a person or use the + buttons to add a spouse or child.',
+  'home.guideStep4Title': 'Add yourself',
+  'home.guideStep4Text': 'New to the tree? Say how you connect and fill in your details — you appear right away.',
+  'home.guideOpenTree': 'Open family tree',
+  'home.guideAddSelf': 'Add yourself',
   'home.privacyStrong': 'A note on privacy:',
   'home.privacyBefore':
     'this is a family history site. Public family websites should never expose sensitive personal information — exact birth dates of living people, home addresses, phone numbers or documents. Before sharing this site publicly, use the privacy controls on the ',
@@ -577,6 +591,8 @@ export const en = {
 
   // About page
   'about.title': 'About this family tree',
+  'about.guideLink': 'How to use the app',
+  'about.guideHint': 'A short illustrated guide is on the Home page.',
   'about.purposeTitle': 'Purpose',
   'about.purposeText':
     "This website keeps our family's story in one living place: who we are, where we come from, and how every branch connects back to the original couple at the top of the tree. It replaces scattered notes, old photo albums and half-remembered dates with something everyone in the family can explore from any phone or computer.",
@@ -931,6 +947,8 @@ export const uz: Record<TKey, string> = {
   'home.born': '{date}da tug‘ilgan',
   'home.birthdaysTitle': 'Tug‘ilgan kunlar',
   'home.bdaysNone': 'Keyingi {days} kun ichida tug‘ilgan kunlar yo‘q.',
+  'home.bdayEmpty':
+    'Keyingi {days} kun ichida tug‘ilgan kun yo‘q. Bu yerda ko‘rinishi uchun odamlarning tug‘ilgan sanasini qo‘shing.',
   'home.annivTitle': "Nikoh to'ylari",
   'home.annivYears': "birgalikda {n} yil",
   'home.annivYearsToday': "bugun birgalikda {n} yil",
@@ -947,6 +965,22 @@ export const uz: Record<TKey, string> = {
   'home.downloadCalendar': 'Kalendarimga qo‘shish',
   'home.calendarDownloaded':
     'Kalendar fayli yuklab olindi — telefoningizda oching, har yili tug‘ilgan kun va to‘y yilligi eslatmalari keladi.',
+  'home.guideTitle': 'Qanday ishlatiladi',
+  'home.guideIntro': 'To‘rtta qisqa qadam — hammasi shajaradan boshlanadi.',
+  'home.guideStep': '{n}-qadam',
+  'home.guideStep1Title': 'Shajarani oching',
+  'home.guideStep1Text': 'Butun oilani bir ekranda ko‘ring. Pinch bilan yaqinlashtiring, tortib siljiting.',
+  'home.guideStep2Title': 'Odam toping',
+  'home.guideStep2Text':
+    'Bosh sahifa yoki Shajara sahifasidagi qidiruvga ism yozing — to‘g‘ridan-to‘g‘ri o‘sha odamga o‘tasiz.',
+  'home.guideStep3Title': 'Tahrirlash yoki qo‘shish',
+  'home.guideStep3Text':
+    'Shajarada «Tahrirlash»ni bosing, odamni oching yoki + tugmalari bilan turmush o‘rtog‘i yoki farzand qo‘shing.',
+  'home.guideStep4Title': 'O‘zingizni qo‘shing',
+  'home.guideStep4Text':
+    'Shajarada yo‘qmisiz? Qanday bog‘lanishingizni ayting va ma’lumotlaringizni to‘ldiring — darhol ko‘rinasiz.',
+  'home.guideOpenTree': 'Shajarani ochish',
+  'home.guideAddSelf': "O'zingizni qo'shing",
   'home.privacyStrong': 'Maxfiylik haqida eslatma:',
   'home.privacyBefore':
     "bu oilaviy tarix sayti. Ochiq oilaviy saytlarda nozik shaxsiy ma'lumotlar — tiriklarning aniq tug'ilgan sanalari, uy manzillari, telefon raqamlari yoki hujjatlar — hech qachon ko'rsatilmasligi kerak. Saytni ochiq ulashishdan oldin ",
@@ -1347,6 +1381,8 @@ export const uz: Record<TKey, string> = {
   'stats.perCountry': 'Har mamlakatdagi odamlar',
 
   'about.title': 'Bu shajara haqida',
+  'about.guideLink': 'Ilovani qanday ishlatish',
+  'about.guideHint': 'Qisqa ko‘rsatmalar Bosh sahifada.',
   'about.purposeTitle': 'Maqsad',
   'about.purposeText':
     "Bu sayt oilamiz tarixini bir joyda saqlaydi: biz kimmiz, qayerdan kelganmiz va har bir shox shajara tepasidagi asoschi juftlikka qanday bog'lanadi. Tarqoq yozuvlar, eski albomlar va yarim unutilgan sanalar o'rniga — istalgan telefon yoki kompyuterdan ochiladigan yagona manba.",

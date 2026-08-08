@@ -87,7 +87,7 @@ export function JoinFamilyModal({ onClose }: JoinFamilyModalProps) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t('join.searchRelative')}
-              className="w-full bg-transparent text-sm outline-none placeholder:text-stone-400"
+              className="w-full bg-transparent text-base outline-none placeholder:text-stone-400"
               aria-label={t('join.searchLabel')}
             />
           </div>

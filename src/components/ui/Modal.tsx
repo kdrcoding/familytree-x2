@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -26,6 +26,7 @@ const FOCUSABLE =
 /** Accessible modal dialog: closes on Escape / backdrop click, traps focus. */
 export function Modal({ onClose, children, labelledBy, size = 'md' }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const [maxHeight, setMaxHeight] = useState('94dvh');
 
   // The latest onClose, WITHOUT re-running the mount effect below. Parents
   // often hand us a fresh function identity on every re-render; if the mount
@@ -36,6 +37,23 @@ export function Modal({ onClose, children, labelledBy, size = 'md' }: ModalProps
   useEffect(() => {
     onCloseRef.current = onClose;
   });
+
+  // Keep the sheet inside the visible viewport when the iOS/Android keyboard opens.
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const sync = () => {
+      const h = Math.min(vv.height, window.innerHeight) * 0.94;
+      setMaxHeight(`${Math.max(240, Math.round(h))}px`);
+    };
+    sync();
+    vv.addEventListener('resize', sync);
+    vv.addEventListener('scroll', sync);
+    return () => {
+      vv.removeEventListener('resize', sync);
+      vv.removeEventListener('scroll', sync);
+    };
+  }, []);
 
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
@@ -71,10 +89,23 @@ export function Modal({ onClose, children, labelledBy, size = 'md' }: ModalProps
         }
       }
     };
+
+    const onFocusIn = (event: FocusEvent) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement) || !panel?.contains(target)) return;
+      if (target.matches('input, textarea, select')) {
+        window.setTimeout(() => {
+          target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }, 100);
+      }
+    };
+
     document.addEventListener('keydown', onKey);
+    document.addEventListener('focusin', onFocusIn);
     document.body.style.overflow = 'hidden';
     return () => {
       document.removeEventListener('keydown', onKey);
+      document.removeEventListener('focusin', onFocusIn);
       if (panel) {
         const i = modalStack.indexOf(panel);
         if (i !== -1) modalStack.splice(i, 1);
@@ -97,7 +128,8 @@ export function Modal({ onClose, children, labelledBy, size = 'md' }: ModalProps
         aria-modal="true"
         aria-labelledby={labelledBy}
         tabIndex={-1}
-        className={`max-h-[94dvh] w-full ${SIZES[size]} animate-modal-in overflow-y-auto overscroll-contain rounded-t-2xl bg-[var(--shajira-card,#ffffff)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-stone-900 shadow-2xl outline-none sm:max-h-[92vh] sm:rounded-2xl sm:p-5 sm:pb-5 dark:bg-stone-900 dark:text-stone-100 dark:ring-1 dark:ring-stone-700`}
+        style={{ maxHeight }}
+        className={`w-full ${SIZES[size]} animate-modal-in overflow-y-auto overscroll-contain rounded-t-2xl bg-[var(--shajira-card,#ffffff)] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-stone-900 shadow-2xl outline-none sm:rounded-2xl sm:p-5 sm:pb-5 dark:bg-stone-900 dark:text-stone-100 dark:ring-1 dark:ring-stone-700`}
       >
         {/* Bottom-sheet affordance on phones. */}
         <div className="mx-auto -mt-0.5 mb-2.5 h-1 w-9 rounded-full bg-stone-200 sm:hidden dark:bg-stone-700" aria-hidden />

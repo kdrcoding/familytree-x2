@@ -64,14 +64,14 @@ export function Layout() {
     }`;
 
   return (
-    <div className="flex min-h-dvh flex-col bg-[var(--shajira-page,#e7e5e4)] text-stone-900 dark:bg-stone-950 dark:text-stone-100">
+    <div className="flex h-dvh flex-col overflow-hidden bg-[var(--shajira-page,#e7e5e4)] text-stone-900 dark:bg-stone-950 dark:text-stone-100">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-[90] focus:rounded-lg focus:bg-brand-700 focus:px-3 focus:py-2 focus:text-white"
       >
         {t('nav.skip')}
       </a>
-      <header className="sticky top-0 z-40 border-b border-stone-300/80 bg-[var(--shajira-panel,#e7e5e4)]/95 backdrop-blur dark:border-stone-800 dark:bg-stone-950/90">
+      <header className="sticky top-0 z-40 border-b border-stone-300/80 bg-[var(--shajira-panel,#e7e5e4)]/95 pt-[var(--safe-top)] backdrop-blur dark:border-stone-800 dark:bg-stone-950/90">
         <div className="mx-auto flex h-12 max-w-7xl items-center gap-1.5 px-3 sm:h-14 sm:gap-2 sm:px-5">
           <NavLink
             to="/"
@@ -205,7 +205,13 @@ export function Layout() {
         )}
       </header>
 
-      <div id="main" tabIndex={-1} className="flex flex-1 flex-col outline-none pb-[3.75rem] lg:pb-0">
+      <div
+        id="main"
+        tabIndex={-1}
+        className={`flex min-h-0 flex-1 flex-col outline-none pb-[var(--bottom-nav-h)] lg:pb-0 ${
+          isTreePage ? 'overflow-hidden' : 'overflow-y-auto overscroll-contain'
+        }`}
+      >
         <Suspense fallback={<PageSkeleton />}>
           <Outlet />
         </Suspense>

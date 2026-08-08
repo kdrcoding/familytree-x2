@@ -63,6 +63,22 @@ export const ruOverrides: Record<string, string> = {
   'home.bdayTomorrow': 'Завтра',
   'home.bdayInDays': 'через {n} дн.',
   'home.downloadCalendar': 'В мой календарь',
+  'home.guideTitle': 'Как пользоваться',
+  'home.guideIntro': 'Четыре коротких шага — всё начинается с семейного древа.',
+  'home.guideStep': 'Шаг {n}',
+  'home.guideStep1Title': 'Откройте древо',
+  'home.guideStep1Text': 'Вся семья на одном экране. Щипком приближайте, пальцем двигайте.',
+  'home.guideStep2Title': 'Найдите человека',
+  'home.guideStep2Text':
+    'Введите имя в поиске на главной или на странице Древа — сразу перейдёте к человеку.',
+  'home.guideStep3Title': 'Править или добавить',
+  'home.guideStep3Text':
+    'Нажмите «Правка» на древе, откройте карточку или добавьте супруга/ребёнка кнопками +.',
+  'home.guideStep4Title': 'Добавьте себя',
+  'home.guideStep4Text':
+    'Вас ещё нет в древе? Укажите связь и свои данные — вы сразу появитесь.',
+  'home.guideOpenTree': 'Открыть древо',
+  'home.guideAddSelf': 'Добавить себя',
 
   'gate.title': 'Семейный сайт',
   'gate.intro': 'Введите семейный пароль, чтобы открыть древо. Если пароля нет — спросите у владельца сайта.',
@@ -188,6 +204,8 @@ export const ruOverrides: Record<string, string> = {
   'common.deceasedShort': 'Умер(ла)',
 
   'home.bdaysNone': 'В ближайшие {days} дн. дней рождения нет.',
+  'home.bdayEmpty':
+    'В ближайшие {days} дн. дней рождения нет. Добавьте даты рождения в карточках — тогда они появятся здесь.',
   'home.bdayTurns': 'исполняется {age}',
   'home.bdayTurnsToday': 'сегодня исполняется {age}',
   'home.bdayToastOne': 'Сегодня день рождения у {name}.',
@@ -306,7 +324,7 @@ export const ruOverrides: Record<string, string> = {
 
   'join.title': 'Добавить себя в семейное древо',
   'join.intro':
-    'Укажите, как вы связаны, затем заполните данные. Вы сразу поянитесь в древе.',
+    'Укажите, как вы связаны, затем заполните данные. Вы сразу появитесь в древе.',
   'join.howRelated': 'Как вы связаны? Я…',
   'join.kindChild': 'ребёнок',
   'join.kindSpouse': 'супруг(а) / партнёр(ша)',
@@ -700,6 +718,8 @@ export const ruOverrides: Record<string, string> = {
 
   // About page
   'about.title': 'О семейном древе',
+  'about.guideLink': 'Как пользоваться приложением',
+  'about.guideHint': 'Краткая иллюстрированная подсказка — на главной странице.',
   'about.purposeTitle': 'Цель',
   'about.purposeText': 'Этот сайт хранит историю нашей семьи в одном месте: кто мы, откуда мы и как каждая ветвь связана с основателями. Вместо разрозненных записей — единый источник, доступный с любого телефона.',
   'about.orgTitle': 'Как организована информация',

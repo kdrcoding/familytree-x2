@@ -168,7 +168,7 @@ function PersonNodeComponent({ data }: NodeProps<PersonFlowNode>) {
               ? t('tree.expandBranch', { n: data.hiddenCount })
               : t('tree.collapseBranch')
           }
-          className="tree-branch-toggle absolute -bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-emerald-200/90 bg-[var(--tree-card-bg,#f3f7f4)] px-1.5 py-0.5 text-[10px] font-semibold text-stone-600 shadow-sm transition-all focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-300"
+          className="tree-branch-toggle absolute -bottom-3 left-1/2 z-10 flex min-h-8 min-w-8 -translate-x-1/2 items-center justify-center gap-0.5 rounded-full border border-emerald-200/90 bg-[var(--tree-card-bg,#f3f7f4)] px-2 py-1 text-[10px] font-semibold text-stone-600 shadow-sm transition-all focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-300"
         >
           {data.collapsed ? (
             <>

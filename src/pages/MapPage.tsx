@@ -153,7 +153,7 @@ export function MapPage() {
   }, [cache, places, t]);
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-6 sm:px-6">
+    <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col px-4 py-6 sm:px-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-stone-900 dark:text-stone-50">
@@ -179,8 +179,7 @@ export function MapPage() {
       ) : (
         <div
           ref={mapEl}
-          className="card mt-4 min-h-[420px] flex-1 overflow-hidden shadow-[0_1px_3px_0_rgb(0_0_0_0.06)] dark:shadow-[0_1px_3px_0_rgb(0_0_0_0.2)]"
-          style={{ height: 'calc(100dvh - 16rem)' }}
+          className="card mt-4 h-[min(55dvh,520px)] min-h-[280px] overflow-hidden shadow-[0_1px_3px_0_rgb(0_0_0_0.06)] sm:h-[min(65dvh,640px)] dark:shadow-[0_1px_3px_0_rgb(0_0_0_0.2)]"
           aria-label={t('map.title')}
         />
       )}

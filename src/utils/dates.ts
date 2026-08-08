@@ -83,6 +83,15 @@ export function formatDate(value?: string, language: 'en' | 'uz' | 'ru' = 'en'):
   return year;
 }
 
+/** Short month label alone (e.g. "Aug" / "avg" / "авг") for birthday chips. */
+export function monthAbbr(
+  month: number,
+  language: 'en' | 'uz' | 'ru' = 'en',
+): string {
+  if (month < 1 || month > 12) return '';
+  return (MONTHS[language] ?? MONTHS.en)[month - 1] ?? '';
+}
+
 /** "3 Aug" / "3 avg" — a day + month with no year, for birthdays. */
 export function formatMonthDay(
   month: number,
