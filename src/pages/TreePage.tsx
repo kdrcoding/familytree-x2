@@ -187,10 +187,14 @@ function TreeCanvas({
   const t = useT();
   const { settings } = useSettings();
   const dark = settings.theme === 'dark';
-  const [minimapOpen, setMinimapOpen] = useState(!easyMode);
+  const [minimapOpen, setMinimapOpen] = useState(false);
+  const [legendOpen, setLegendOpen] = useState(false);
 
   useEffect(() => {
-    if (easyMode) setMinimapOpen(false);
+    if (easyMode) {
+      setMinimapOpen(false);
+      setLegendOpen(false);
+    }
   }, [easyMode]);
   const didInitialFocus = useRef(false);
   const startZoom = easyMode ? START_ZOOM_EASY : START_ZOOM;
@@ -274,46 +278,64 @@ function TreeCanvas({
         color={dark ? 'rgba(168, 162, 158, 0.14)' : 'rgba(120, 113, 108, 0.18)'}
       />
       {!easyMode && (
-        <Panel
-          position="top-left"
-          className="!m-2 hidden sm:!m-3 sm:block"
-        >
-          <div className="tree-legend">
-            <p className="mb-1.5 font-semibold text-stone-700 dark:text-stone-200">
-              {t('tree.legendTitle')}
-            </p>
-            <ul className="space-y-1.5 text-stone-600 dark:text-stone-300">
-              <li className="flex items-center gap-2">
-                <span
-                  aria-hidden
-                  className="inline-block h-0.5 w-5 rounded bg-rose-400 dark:bg-rose-500"
-                />
-                <span>{t('tree.legendMarried')}</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <svg width="20" height="2" aria-hidden className="shrink-0">
-                  <line
-                    x1="0"
-                    y1="1"
-                    x2="20"
-                    y2="1"
-                    strokeWidth="2"
-                    strokeDasharray="2 4"
-                    className="stroke-stone-400 dark:stroke-stone-500"
+        <Panel position="top-left" className="!m-2 sm:!m-3">
+          {legendOpen ? (
+            <div className="tree-legend">
+              <div className="mb-1.5 flex items-center justify-between gap-2">
+                <p className="font-semibold text-stone-700 dark:text-stone-200">
+                  {t('tree.legendTitle')}
+                </p>
+                <button
+                  type="button"
+                  className="icon-btn !h-7 !w-7"
+                  onClick={() => setLegendOpen(false)}
+                  aria-label={t('common.close')}
+                >
+                  <X className="h-3.5 w-3.5" aria-hidden />
+                </button>
+              </div>
+              <ul className="space-y-1.5 text-stone-600 dark:text-stone-300">
+                <li className="flex items-center gap-2">
+                  <span
+                    aria-hidden
+                    className="inline-block h-0.5 w-5 rounded bg-rose-400 dark:bg-rose-500"
                   />
-                </svg>
-                <span>{t('tree.legendDivorced')}</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span aria-hidden className="flex items-center">
-                  <span className="inline-block h-2 w-2 rounded-full bg-brand-500" />
-                  <span className="inline-block h-0.5 w-3 bg-brand-500" />
-                  <span className="-ml-px inline-block border-y-[3px] border-l-[5px] border-y-transparent border-l-brand-500" />
-                </span>
-                <span>{t('tree.legendChildren')}</span>
-              </li>
-            </ul>
-          </div>
+                  <span>{t('tree.legendMarried')}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <svg width="20" height="2" aria-hidden className="shrink-0">
+                    <line
+                      x1="0"
+                      y1="1"
+                      x2="20"
+                      y2="1"
+                      strokeWidth="2"
+                      strokeDasharray="2 4"
+                      className="stroke-stone-400 dark:stroke-stone-500"
+                    />
+                  </svg>
+                  <span>{t('tree.legendDivorced')}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span aria-hidden className="flex items-center">
+                    <span className="inline-block h-2 w-2 rounded-full bg-brand-500" />
+                    <span className="inline-block h-0.5 w-3 bg-brand-500" />
+                    <span className="-ml-px inline-block border-y-[3px] border-l-[5px] border-y-transparent border-l-brand-500" />
+                  </span>
+                  <span>{t('tree.legendChildren')}</span>
+                </li>
+              </ul>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className="tree-action-btn"
+              onClick={() => setLegendOpen(true)}
+              aria-label={t('tree.legendTitle')}
+            >
+              {t('tree.legendTitle')}
+            </button>
+          )}
         </Panel>
       )}
       <Panel position="top-right" className="!m-2 flex gap-1.5 sm:!m-3 sm:flex-col">
