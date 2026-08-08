@@ -82,7 +82,7 @@ function Field({
 }) {
   return (
     <label className={`block ${className ?? ''}`}>
-      <span className="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-300">
+      <span className="mb-0.5 block text-[13px] font-medium text-stone-700 sm:mb-1 sm:text-sm dark:text-stone-300">
         {label}
       </span>
       {children}
@@ -695,7 +695,7 @@ export function PersonFormModal({
           </p>
         )}
 
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:mt-4 sm:grid-cols-2 sm:gap-4">
           <Field label={t('form.firstName')} error={err(errors.firstName)}>
             <input
               type="text"
@@ -704,6 +704,7 @@ export function PersonFormModal({
               onChange={(e) => set('firstName', e.target.value)}
               ref={firstNameRef}
               autoFocus
+              autoComplete="given-name"
             />
           </Field>
           <Field label={t('form.lastName')} error={err(errors.lastName)}>
@@ -712,6 +713,7 @@ export function PersonFormModal({
               className="input"
               value={values.lastName}
               onChange={(e) => set('lastName', e.target.value)}
+              autoComplete="family-name"
             />
           </Field>
           <Field label={t('form.gender')}>
@@ -725,18 +727,23 @@ export function PersonFormModal({
               <option value="male">{t('filters.male')}</option>
             </select>
           </Field>
+          <DateField
+            label={t('form.birthDate')}
+            value={values.birthDate}
+            onChange={(v) => set('birthDate', v)}
+            error={err(errors.birthDate)}
+          />
         </div>
 
-        {/* Everything beyond name + gender is optional and stays out of the
-            way, so adding a person takes seconds. */}
+        {/* Everything beyond the essentials stays collapsed so adding is fast. */}
         <details
-          className="mt-4 rounded-xl border border-stone-200 dark:border-stone-700"
+          className="mt-3 rounded-xl border border-stone-200 dark:border-stone-700 sm:mt-4"
           open={isEdit}
         >
-          <summary className="cursor-pointer select-none rounded-xl px-4 py-3 text-sm font-medium text-stone-700 hover:bg-stone-50 dark:text-stone-300 dark:hover:bg-stone-800/60">
+          <summary className="cursor-pointer select-none rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 hover:bg-stone-50 dark:text-stone-300 dark:hover:bg-stone-800/60 sm:px-4 sm:py-3">
             {t('form.moreDetails')}
           </summary>
-          <div className="grid grid-cols-1 gap-4 border-t border-stone-200 p-4 sm:grid-cols-2 dark:border-stone-700">
+          <div className="grid grid-cols-1 gap-3 border-t border-stone-200 p-3 sm:grid-cols-2 sm:gap-4 sm:p-4 dark:border-stone-700">
             <Field label={t('form.nickname')}>
               <input
                 type="text"
@@ -745,14 +752,8 @@ export function PersonFormModal({
                 onChange={(e) => set('nickname', e.target.value)}
               />
             </Field>
-            <DateField
-              label={t('form.birthDate')}
-              value={values.birthDate}
-              onChange={(v) => set('birthDate', v)}
-              error={err(errors.birthDate)}
-            />
             <div>
-              <label className="flex h-full items-center gap-2 pt-6 text-sm text-stone-700 dark:text-stone-300">
+              <label className="flex h-full items-center gap-2 pt-1 text-sm text-stone-700 sm:pt-6 dark:text-stone-300">
                 <input
                   type="checkbox"
                   className="h-4 w-4 rounded border-stone-300 text-brand-600 focus:ring-brand-500"
@@ -819,7 +820,7 @@ export function PersonFormModal({
             </Field>
             <Field label={t('form.bio')} className="sm:col-span-2">
               <textarea
-                className="input min-h-20"
+                className="input min-h-16 sm:min-h-20"
                 value={values.biography}
                 onChange={(e) => set('biography', e.target.value)}
               />
@@ -980,10 +981,10 @@ export function PersonFormModal({
         {/* Sticky save bar. The modal panel has bottom padding inside its
             scroll area; the negative bottom/margin let the bar cover that
             strip so scrolled content never peeks out underneath it. */}
-        <div className="sticky bottom-[calc(-1*max(1.25rem,env(safe-area-inset-bottom)))] z-10 -mx-5 mb-[calc(-1*max(1.25rem,env(safe-area-inset-bottom)))] mt-6 flex flex-wrap justify-end gap-2 border-t border-stone-200 bg-white px-5 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 dark:border-stone-700 dark:bg-stone-900">
+        <div className="sticky bottom-[calc(-1*max(1rem,env(safe-area-inset-bottom)))] z-10 -mx-4 mb-[calc(-1*max(1rem,env(safe-area-inset-bottom)))] mt-4 flex gap-2 border-t border-stone-200 bg-white px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:-mx-5 sm:mb-[calc(-1*max(1.25rem,env(safe-area-inset-bottom)))] sm:mt-6 sm:px-5 dark:border-stone-700 dark:bg-stone-900">
           <button
             type="button"
-            className="btn-secondary"
+            className="btn-secondary !min-h-11 shrink-0"
             onClick={selfJoin && onBack ? onBack : handleClose}
           >
             {selfJoin && onBack ? t('common.back') : t('common.cancel')}
@@ -991,7 +992,7 @@ export function PersonFormModal({
           {!isEdit && !selfJoin && (
             <button
               type="button"
-              className="btn-secondary"
+              className="btn-secondary !hidden !min-h-11 sm:!inline-flex"
               onClick={() => void saveAndAddAnother()}
               disabled={saving}
               title={t('form.saveAnotherTitle')}
@@ -999,7 +1000,7 @@ export function PersonFormModal({
               {t('form.saveAnother')}
             </button>
           )}
-          <button type="submit" className="btn-primary flex-1 sm:flex-none" disabled={saving}>
+          <button type="submit" className="btn-primary !min-h-11 flex-1" disabled={saving}>
             {selfJoin ? t('form.addMe') : isEdit ? t('form.save') : t('form.add')}
           </button>
         </div>

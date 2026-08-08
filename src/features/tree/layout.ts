@@ -6,10 +6,9 @@ import type { PersonIndex } from '../../utils/family';
 import { dnaPaletteForParents } from './dnaColor';
 import type { DnaPalette } from './dnaColor';
 
-// Cards are wide enough to show a full "First Last" name across two lines and
-// tall enough for the name, nickname, dates and the gender/deceased badges.
-export const CARD_W = 276;
-export const CARD_H = 130;
+// Compact cards so more of the tree fits on a phone screen without looking busy.
+export const CARD_W = 200;
+export const CARD_H = 92;
 
 export type TreeOrientation = 'vertical' | 'horizontal';
 export type TreeSpacing = 'comfortable' | 'compact';
@@ -21,19 +20,19 @@ const SPACING: Record<
 > = {
   // Tighter spouse/root gaps keep the oldest generation together; a taller
   // level gap leaves room for separate green bus lanes between rows.
-  comfortable: { spouse: 28, sibling: 40, level: 176, root: 48 },
-  compact: { spouse: 20, sibling: 24, level: 140, root: 32 },
+  comfortable: { spouse: 24, sibling: 32, level: 148, root: 40 },
+  compact: { spouse: 16, sibling: 18, level: 112, root: 24 },
 };
 
 const JUNCTION = 10;
 // Child connectors run along a "bus" just before the children. Each couple
 // gets its own lane so a long cross-family link crosses other buses instead
 // of running on top of them (see ChildEdge).
-const BUS_BASE = 44;
-const BUS_STEP = 20;
+const BUS_BASE = 36;
+const BUS_STEP = 16;
 const BUS_LANES = 5;
 // Room reserved before each generation row for its label chip.
-const GEN_LABEL_GAP = 148;
+const GEN_LABEL_GAP = 120;
 
 /**
  * How many whole generations open on a family's first view before deeper
@@ -63,6 +62,8 @@ export interface GenLabelData extends Record<string, unknown> {
 export interface TreeLayoutOptions {
   orientation?: TreeOrientation;
   spacing?: TreeSpacing;
+  /** Generation chips on the side — hide on phones to free horizontal space. */
+  showGenLabels?: boolean;
 }
 
 /**
@@ -239,7 +240,8 @@ export function computeTreeLayout(
   options: TreeLayoutOptions = {},
 ): TreeLayout {
   const orientation = options.orientation ?? 'vertical';
-  const gap = SPACING[options.spacing ?? 'comfortable'];
+  const gap = SPACING[options.spacing ?? 'compact'];
+  const showGenLabels = options.showGenLabels !== false;
   const index = buildIndex(people);
   const visited = new Set<string>();
   const suppressed = new Set<string>();
@@ -552,23 +554,25 @@ export function computeTreeLayout(
 
   // One label chip per generation row, placed just before the row's first card.
   const genLabelNodes: Node<GenLabelData, 'genLabel'>[] = [];
-  const rowMinX = new Map<number, number>();
-  for (const node of nodes) {
-    const depth = depthByNode.get(node.id) ?? 0;
-    rowMinX.set(depth, Math.min(rowMinX.get(depth) ?? Infinity, node.position.x));
-  }
-  for (const [depth, minX] of rowMinX) {
-    genLabelNodes.push({
-      id: `gen-${depth}`,
-      type: 'genLabel',
-      position: { x: minX - GEN_LABEL_GAP, y: depth * (CARD_H + gap.level) + CARD_H / 2 - 16 },
-      width: GEN_LABEL_GAP - 24,
-      height: 32,
-      data: { generation: depth + 1, orientation },
-      draggable: false,
-      selectable: false,
-      connectable: false,
-    });
+  if (showGenLabels) {
+    const rowMinX = new Map<number, number>();
+    for (const node of nodes) {
+      const depth = depthByNode.get(node.id) ?? 0;
+      rowMinX.set(depth, Math.min(rowMinX.get(depth) ?? Infinity, node.position.x));
+    }
+    for (const [depth, minX] of rowMinX) {
+      genLabelNodes.push({
+        id: `gen-${depth}`,
+        type: 'genLabel',
+        position: { x: minX - GEN_LABEL_GAP, y: depth * (CARD_H + gap.level) + CARD_H / 2 - 16 },
+        width: GEN_LABEL_GAP - 24,
+        height: 32,
+        data: { generation: depth + 1, orientation },
+        draggable: false,
+        selectable: false,
+        connectable: false,
+      });
+    }
   }
 
   // Horizontal orientation: reflect every position across the main diagonal

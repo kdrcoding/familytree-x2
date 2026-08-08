@@ -8,7 +8,6 @@ import { useT } from '../../i18n/useT';
 import { lifespan } from '../../utils/dates';
 import { fullName } from '../../utils/family';
 import { Avatar } from '../../components/Avatar';
-import { DeceasedBadge, GenderBadge } from '../../components/badges';
 import { CARD_H, CARD_W } from './layout';
 import type { PersonFlowNode } from './layout';
 import { useTreeInteraction } from './TreeInteractionContext';
@@ -55,7 +54,7 @@ function PersonNodeComponent({ data }: NodeProps<PersonFlowNode>) {
         onClick={() => onOpen(person.id)}
         aria-label={t('tree.openDetails', { name })}
         title={name}
-        className={`tree-person-card flex h-full w-full items-center gap-2.5 rounded-xl border border-l-4 px-3 text-left shadow-sm ring-1 ring-emerald-900/5 transition-all hover:-translate-y-0.5 hover:shadow focus-visible:ring-2 focus-visible:ring-brand-500 active:translate-y-0 dark:ring-white/5 dark:hover:shadow-lg dark:hover:shadow-black/30 ${
+        className={`tree-person-card flex h-full w-full items-center gap-2 rounded-xl border border-l-[3px] px-2.5 text-left shadow-sm ring-1 ring-emerald-900/5 transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-brand-500 dark:ring-white/5 ${
           GENDER_ACCENT[person.gender]
         } ${
           person.isDeceased
@@ -64,9 +63,9 @@ function PersonNodeComponent({ data }: NodeProps<PersonFlowNode>) {
         }`}
       >
         <Avatar person={person} size="sm" />
-        <span className="min-w-0 flex-1">
+        <span className="min-w-0 flex-1 py-0.5">
           <span
-            className="tree-person-name block text-[15px] font-semibold leading-tight text-stone-800 dark:text-stone-100"
+            className="tree-person-name block text-[13px] font-semibold leading-snug text-stone-800 dark:text-stone-100"
             style={{
               display: '-webkit-box',
               WebkitLineClamp: 2,
@@ -76,17 +75,8 @@ function PersonNodeComponent({ data }: NodeProps<PersonFlowNode>) {
           >
             {name}
           </span>
-          {person.nickname && (
-            <span className="tree-person-meta block truncate text-[13px] text-stone-500 dark:text-stone-400">
-              “{person.nickname}”
-            </span>
-          )}
-          <span className="tree-person-meta block truncate text-[13px] text-stone-500 dark:text-stone-400">
-            {years || getLabel(person)}
-          </span>
-          <span className="mt-1 flex gap-1">
-            <GenderBadge gender={person.gender} compact />
-            <DeceasedBadge person={person} compact />
+          <span className="tree-person-meta mt-0.5 block truncate text-[11px] text-stone-500 dark:text-stone-400">
+            {years || (person.nickname ? `“${person.nickname}”` : getLabel(person))}
           </span>
         </span>
       </button>
@@ -103,11 +93,11 @@ function PersonNodeComponent({ data }: NodeProps<PersonFlowNode>) {
               onQuickAdd('spouse', person.id);
             }}
           >
-            <Heart className="h-3 w-3" aria-hidden />
+            <Heart className="h-3.5 w-3.5" aria-hidden />
           </button>
           <button
             type="button"
-            className="quick-add absolute -bottom-3 right-5 z-10"
+            className="quick-add absolute -bottom-3 right-4 z-10"
             title={t('tree.quickChild', { name })}
             aria-label={t('tree.quickChild', { name })}
             onClick={(event) => {
@@ -115,7 +105,7 @@ function PersonNodeComponent({ data }: NodeProps<PersonFlowNode>) {
               onQuickAdd('child', person.id);
             }}
           >
-            <Baby className="h-3 w-3" aria-hidden />
+            <Baby className="h-3.5 w-3.5" aria-hidden />
           </button>
           {person.parentIds.length === 0 && (
             <button
@@ -128,7 +118,7 @@ function PersonNodeComponent({ data }: NodeProps<PersonFlowNode>) {
                 onQuickAdd('parent', person.id);
               }}
             >
-              <UserRoundPlus className="h-3 w-3" aria-hidden />
+              <UserRoundPlus className="h-3.5 w-3.5" aria-hidden />
             </button>
           )}
         </>
@@ -146,7 +136,7 @@ function PersonNodeComponent({ data }: NodeProps<PersonFlowNode>) {
               ? t('tree.expandBranch', { n: data.hiddenCount })
               : t('tree.collapseBranch')
           }
-          className="tree-branch-toggle absolute -bottom-3.5 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full border border-emerald-200/90 bg-[var(--tree-card-bg,#f3f7f4)] px-2 py-0.5 text-[10px] font-semibold text-stone-600 shadow-sm transition-all hover:border-emerald-400 hover:text-emerald-800 hover:shadow focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-300 dark:hover:border-emerald-600"
+          className="tree-branch-toggle absolute -bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-emerald-200/90 bg-[var(--tree-card-bg,#f3f7f4)] px-1.5 py-0.5 text-[10px] font-semibold text-stone-600 shadow-sm transition-all focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-stone-600 dark:bg-stone-800 dark:text-stone-300"
         >
           {data.collapsed ? (
             <>

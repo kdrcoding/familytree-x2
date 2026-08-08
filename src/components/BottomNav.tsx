@@ -19,10 +19,10 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-stone-300/80 bg-[var(--shajira-panel,#e7e5e4)]/95 pb-[max(0.35rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden dark:border-stone-800 dark:bg-stone-950/95"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-stone-300/80 bg-[var(--shajira-panel,#e7e5e4)]/95 pb-[max(0.25rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden dark:border-stone-800 dark:bg-stone-950/95"
       aria-label={t('nav.bottomNav')}
     >
-      <ul className="mx-auto grid max-w-lg grid-cols-4 gap-0.5 px-1.5 pt-0.5">
+      <ul className="mx-auto grid max-w-lg grid-cols-4 gap-0 px-1 pt-0.5">
         {TABS.map((tab) => {
           const Icon = tab.icon;
           return (
@@ -31,15 +31,15 @@ export function BottomNav() {
                 to={tab.to}
                 end={tab.end}
                 className={({ isActive }) =>
-                  `flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1 text-center transition-colors ${
+                  `flex min-h-11 flex-col items-center justify-center gap-0 rounded-xl px-1 py-1 text-center transition-colors ${
                     isActive
                       ? 'bg-brand-100 text-brand-800 dark:bg-brand-900/50 dark:text-brand-200'
                       : 'text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-900'
                   }`
                 }
               >
-                <Icon className="h-5 w-5" aria-hidden />
-                <span className="max-w-full truncate text-[0.65rem] font-bold leading-tight tracking-wide">
+                <Icon className="h-[1.15rem] w-[1.15rem]" aria-hidden />
+                <span className="max-w-full truncate text-[0.62rem] font-bold leading-tight tracking-wide">
                   {t(tab.labelKey)}
                 </span>
               </NavLink>

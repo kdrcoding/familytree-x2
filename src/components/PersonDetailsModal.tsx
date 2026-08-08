@@ -340,38 +340,31 @@ export function PersonDetailsModal({
         )}
       </div>
 
-      <div className="mt-5 border-t border-stone-200 pt-4 dark:border-stone-700">
+      <div className="sticky bottom-[calc(-1*max(1rem,env(safe-area-inset-bottom)))] z-10 -mx-4 mb-[calc(-1*max(1rem,env(safe-area-inset-bottom)))] mt-4 border-t border-stone-200 bg-white px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:-mx-5 sm:mb-[calc(-1*max(1.25rem,env(safe-area-inset-bottom)))] sm:mt-5 sm:px-5 dark:border-stone-700 dark:bg-stone-900">
         {editMode ? (
-          // Relatives are added straight from the tree cards (the heart / baby
-          // / parent icons), so this popup only needs Edit and Delete.
-          <div className="flex justify-end gap-1.5">
-            <button type="button" className="btn-secondary" onClick={() => onEdit?.(person)}>
+          <div className="flex gap-2">
+            <button type="button" className="btn-secondary !min-h-11 flex-1" onClick={() => onEdit?.(person)}>
               <Pencil className="h-4 w-4" aria-hidden /> {t('person.edit')}
             </button>
             {canDelete && (
-              <button type="button" className="btn-danger" onClick={() => onDelete?.(person)}>
-                <Trash2 className="h-4 w-4" aria-hidden /> {t('person.delete')}
+              <button type="button" className="btn-danger !min-h-11" onClick={() => onDelete?.(person)}>
+                <Trash2 className="h-4 w-4" aria-hidden />
+                <span className="hidden sm:inline">{t('person.delete')}</span>
               </button>
             )}
           </div>
         ) : (
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="flex items-center gap-1.5 text-xs text-stone-400 dark:text-stone-500">
-              <Pencil className="h-3.5 w-3.5" aria-hidden />
-              {t('person.viewHint')}
-            </span>
-            <div className="flex gap-1.5">
-              <button type="button" className="btn-secondary" onClick={onClose}>
-                {t('common.close')}
-              </button>
-              <button
-                type="button"
-                className="btn-primary"
-                onClick={() => onRequestEdit?.(person)}
-              >
-                <Pencil className="h-4 w-4" aria-hidden /> {t('person.edit')}
-              </button>
-            </div>
+          <div className="flex gap-2">
+            <button type="button" className="btn-secondary !min-h-11" onClick={onClose}>
+              {t('common.close')}
+            </button>
+            <button
+              type="button"
+              className="btn-primary !min-h-11 flex-1"
+              onClick={() => onRequestEdit?.(person)}
+            >
+              <Pencil className="h-4 w-4" aria-hidden /> {t('person.edit')}
+            </button>
           </div>
         )}
       </div>

@@ -43,8 +43,9 @@ import type { TreeInteraction } from '../features/tree/TreeInteractionContext';
 const nodeTypes: NodeTypes = { person: PersonNode, junction: JunctionNode, genLabel: GenLabelNode };
 const edgeTypes: EdgeTypes = { child: ChildEdge };
 
-const START_ZOOM = 1.1;
-const START_ZOOM_EASY = 1.25;
+const START_ZOOM = 1.05;
+const START_ZOOM_EASY = 1.2;
+const START_ZOOM_PHONE = 1.15;
 const FOCUS_ZOOM = 1.2;
 const FOCUS_ZOOM_EASY = 1.35;
 
@@ -189,6 +190,16 @@ function TreeCanvas({
   const dark = settings.theme === 'dark';
   const [minimapOpen, setMinimapOpen] = useState(false);
   const [legendOpen, setLegendOpen] = useState(false);
+  const [isPhone, setIsPhone] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 640px)');
+    const onChange = () => setIsPhone(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
 
   useEffect(() => {
     if (easyMode) {
@@ -197,7 +208,7 @@ function TreeCanvas({
     }
   }, [easyMode]);
   const didInitialFocus = useRef(false);
-  const startZoom = easyMode ? START_ZOOM_EASY : START_ZOOM;
+  const startZoom = easyMode ? START_ZOOM_EASY : isPhone ? START_ZOOM_PHONE : START_ZOOM;
   const focusZoom = easyMode ? FOCUS_ZOOM_EASY : FOCUS_ZOOM;
 
   const focusTopOfTree = useCallback(
@@ -277,7 +288,7 @@ function TreeCanvas({
         size={1.25}
         color={dark ? 'rgba(168, 162, 158, 0.14)' : 'rgba(120, 113, 108, 0.18)'}
       />
-      {!easyMode && (
+      {!easyMode && !isPhone && (
         <Panel position="top-left" className="!m-2 sm:!m-3">
           {legendOpen ? (
             <div className="tree-legend">
@@ -338,22 +349,26 @@ function TreeCanvas({
           )}
         </Panel>
       )}
-      <Panel position="top-right" className="!m-2 flex gap-1.5 sm:!m-3 sm:flex-col">
+      <Panel position="top-right" className="!m-1.5 flex gap-1 sm:!m-3 sm:flex-col">
         <button
           type="button"
-          className="tree-action-btn inline-flex items-center gap-1.5"
+          className="tree-action-btn inline-flex items-center gap-1.5 !px-2.5 !py-2"
           onClick={() => focusTopOfTree()}
+          aria-label={t('tree.zoomReadable')}
+          title={t('tree.zoomReadable')}
         >
-          <ZoomIn className="h-3.5 w-3.5" aria-hidden />
-          {t('tree.zoomReadable')}
+          <ZoomIn className="h-4 w-4" aria-hidden />
+          <span className="hidden sm:inline">{t('tree.zoomReadable')}</span>
         </button>
         <button
           type="button"
-          className="tree-action-btn inline-flex items-center gap-1.5"
-          onClick={() => fitView({ padding: 0.16, duration: 500, maxZoom: startZoom })}
+          className="tree-action-btn inline-flex items-center gap-1.5 !px-2.5 !py-2"
+          onClick={() => fitView({ padding: 0.12, duration: 500, maxZoom: startZoom })}
+          aria-label={t('tree.fitTree')}
+          title={t('tree.fitTree')}
         >
-          <Maximize2 className="h-3.5 w-3.5" aria-hidden />
-          {t('tree.fitTree')}
+          <Maximize2 className="h-4 w-4" aria-hidden />
+          <span className="hidden sm:inline">{t('tree.fitTree')}</span>
         </button>
       </Panel>
       <Panel position="bottom-left" className="!m-3 !mb-20 hidden sm:block lg:!mb-3">
@@ -362,7 +377,7 @@ function TreeCanvas({
       <Controls
         showInteractive={false}
         position="bottom-right"
-        className={`family-tree-controls !mb-[4.75rem] !mr-2 overflow-hidden rounded-xl border border-stone-200/90 shadow-md sm:!mb-16 lg:!mb-3 lg:!mr-3 ${easyMode ? 'tree-controls-easy' : ''}`}
+        className={`family-tree-controls !mb-[4.5rem] !mr-1.5 overflow-hidden rounded-xl border border-stone-200/90 shadow-md sm:!mb-16 sm:!mr-2 lg:!mb-3 lg:!mr-3 ${easyMode ? 'tree-controls-easy' : ''}`}
       />
 
       <Panel position="bottom-right" className="!bottom-16 !right-3 hidden md:block">
@@ -399,6 +414,16 @@ export function TreePage() {
   const confirm = useConfirm();
   const t = useT();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isPhone, setIsPhone] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 640px)');
+    const onChange = () => setIsPhone(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
 
   const [collapsedList, setCollapsedList] = usePersistentState<string[]>(
     STORAGE_KEYS.collapsed,
@@ -431,7 +456,14 @@ export function TreePage() {
     }
   }, [searchParams, setSearchParams]);
 
-  const layout = useMemo(() => computeTreeLayout(people, collapsed), [people, collapsed]);
+  const layout = useMemo(
+    () =>
+      computeTreeLayout(people, collapsed, {
+        spacing: 'compact',
+        showGenLabels: !isPhone,
+      }),
+    [people, collapsed, isPhone],
+  );
   const flowNodes = useMemo(
     () => [...layout.genLabelNodes, ...layout.nodes, ...layout.junctionNodes] as Node[],
     [layout],
@@ -578,39 +610,47 @@ export function TreePage() {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="tree-page-toolbar">
-        <div className="mx-auto flex max-w-[1600px] flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-3">
-          <TreeSearch onSelect={focusPerson} large />
+        <div className="mx-auto flex max-w-[1600px] items-center gap-1.5 sm:gap-3">
+          <div className="min-w-0 flex-1">
+            <TreeSearch onSelect={focusPerson} large />
+          </div>
 
-          <div className="flex shrink-0 items-center gap-1.5 sm:ml-auto">
+          <div className="flex shrink-0 items-center gap-1">
             <Link
               to="/members"
-              className="btn-secondary !min-h-10 !px-2.5 sm:!px-3"
+              className="btn-secondary !hidden !min-h-10 !px-2.5 sm:!inline-flex sm:!px-3"
               aria-label={t('tree.listView')}
             >
               <Users className="h-4 w-4" aria-hidden />
               <span className="hidden sm:inline">{t('tree.listView')}</span>
             </Link>
             {editMode && (
-              <button type="button" className="btn-primary !min-h-10" onClick={() => setForm({})}>
+              <button
+                type="button"
+                className="btn-primary !hidden !min-h-10 sm:!inline-flex"
+                onClick={() => setForm({})}
+              >
                 <UserPlus className="h-4 w-4" aria-hidden />
                 <span className="hidden sm:inline">{t('tree.addPerson')}</span>
               </button>
             )}
             <button
               type="button"
-              className={`${editMode ? 'btn-primary' : 'btn-secondary'} !min-h-10 !px-2.5 sm:!px-3`}
+              className={`${editMode ? 'btn-primary' : 'btn-secondary'} !min-h-10 !min-w-10 !px-2.5 sm:!px-3`}
               onClick={() => {
                 if (!canEdit) setUnlockOpen(true);
                 else setEditMode((on) => !on);
               }}
               aria-pressed={editMode}
+              aria-label={editMode ? t('tree.editing') : t('tree.editMode')}
+              title={editMode ? t('tree.editing') : t('tree.editMode')}
             >
               {canEdit ? (
                 <LockOpen className="h-4 w-4" aria-hidden />
               ) : (
                 <Lock className="h-4 w-4" aria-hidden />
               )}
-              <span className="hidden sm:inline">
+              <span className="hidden md:inline">
                 {editMode ? t('tree.editing') : t('tree.editMode')}
               </span>
             </button>
@@ -649,7 +689,7 @@ export function TreePage() {
         </div>
       </div>
 
-      <div className="relative min-h-0 flex-1" style={{ minHeight: 'calc(100dvh - 12rem)' }}>
+      <div className="relative min-h-0 flex-1" style={{ minHeight: 'calc(100dvh - 10.5rem)' }}>
         <div className="absolute inset-0 bg-[var(--shajira-page,#e7e5e4)] dark:bg-stone-950">
           <TreeInteractionContext.Provider value={interaction}>
             <ReactFlowProvider>
@@ -663,6 +703,17 @@ export function TreePage() {
             </ReactFlowProvider>
           </TreeInteractionContext.Provider>
         </div>
+
+        {editMode && (
+          <button
+            type="button"
+            className="btn-primary fixed bottom-[4.75rem] right-3 z-30 !min-h-12 !min-w-12 rounded-full shadow-lg shadow-brand-900/25 sm:hidden"
+            onClick={() => setForm({})}
+            aria-label={t('tree.addPerson')}
+          >
+            <UserPlus className="h-5 w-5" aria-hidden />
+          </button>
+        )}
       </div>
 
       {detailsId && (

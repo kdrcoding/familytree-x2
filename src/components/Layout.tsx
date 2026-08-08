@@ -222,7 +222,7 @@ export function Layout() {
         )}
       </header>
 
-      <div id="main" tabIndex={-1} className="flex flex-1 flex-col outline-none pb-20 lg:pb-0">
+      <div id="main" tabIndex={-1} className="flex flex-1 flex-col outline-none pb-[3.75rem] lg:pb-0">
         <Suspense fallback={<PageSkeleton />}>
           <Outlet />
         </Suspense>
