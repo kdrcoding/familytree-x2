@@ -8,7 +8,6 @@ import { useT } from '../i18n/useT';
 import { MadeByKadir } from './MadeByKadir';
 import { BottomNav } from './BottomNav';
 import { PageSkeleton } from './PageSkeleton';
-import { WelcomeTour } from './WelcomeTour';
 import { BrandLogo } from './BrandLogo';
 
 export function Layout() {
@@ -240,7 +239,6 @@ export function Layout() {
       </div>
 
       <BottomNav />
-      <WelcomeTour />
     </div>
   );
 }

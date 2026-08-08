@@ -20,7 +20,7 @@ import { useSettings } from '../context/SettingsContext';
 import { useToast } from '../context/ToastContext';
 import { usePersistentState } from '../hooks/usePersistentState';
 import { useT } from '../i18n/useT';
-import { loadJson, saveJson, STORAGE_KEYS } from '../utils/storage';
+import { STORAGE_KEYS } from '../utils/storage';
 import { getAncestorIds, fullName } from '../utils/family';
 import { matchesSearch } from '../utils/filters';
 import { MadeByKadir } from '../components/MadeByKadir';
@@ -192,10 +192,6 @@ function TreeCanvas({
   useEffect(() => {
     if (easyMode) setMinimapOpen(false);
   }, [easyMode]);
-  const [tipVisible, setTipVisible] = useState(() => {
-    if (easyMode) return false;
-    return loadJson<boolean>(STORAGE_KEYS.treeTipSeen, (v): v is boolean => typeof v === 'boolean') !== true;
-  });
   const didInitialFocus = useRef(false);
   const startZoom = easyMode ? START_ZOOM_EASY : START_ZOOM;
   const focusZoom = easyMode ? FOCUS_ZOOM_EASY : FOCUS_ZOOM;
@@ -249,11 +245,6 @@ function TreeCanvas({
     didInitialFocus.current = true;
     focusTopOfTree(undefined, false);
   }, [nodes, focusTopOfTree]);
-
-  const dismissTip = () => {
-    setTipVisible(false);
-    saveJson(STORAGE_KEYS.treeTipSeen, true);
-  };
 
   return (
     <ReactFlow
@@ -322,23 +313,6 @@ function TreeCanvas({
                 <span>{t('tree.legendChildren')}</span>
               </li>
             </ul>
-          </div>
-        </Panel>
-      )}
-      {tipVisible && (
-        <Panel position="top-center" className="!m-2 sm:!m-3">
-          <div className="tree-tip">
-            <div className="flex items-start gap-2">
-              <p className="flex-1 leading-snug text-stone-700 dark:text-stone-200">{t('tree.tip')}</p>
-              <button
-                type="button"
-                className="icon-btn !h-8 !w-8 shrink-0"
-                onClick={dismissTip}
-                aria-label={t('common.close')}
-              >
-                <X className="h-4 w-4" aria-hidden />
-              </button>
-            </div>
           </div>
         </Panel>
       )}
@@ -582,10 +556,10 @@ export function TreePage() {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="tree-page-toolbar">
-        <div className="mx-auto flex max-w-[1600px] flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="mx-auto flex max-w-[1600px] flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-3">
           <TreeSearch onSelect={focusPerson} large />
 
-          <div className="flex items-center gap-1.5 sm:ml-auto">
+          <div className="flex shrink-0 items-center gap-1.5 sm:ml-auto">
             <Link
               to="/members"
               className="btn-secondary !min-h-10 !px-2.5 sm:!px-3"
