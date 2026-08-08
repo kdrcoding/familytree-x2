@@ -224,7 +224,7 @@ export function PersonDetailsModal({
         <div className="min-w-0 flex-1">
           <h2
             id="person-details-title"
-            className="text-xl font-bold text-stone-900 dark:text-stone-100"
+            className="break-words text-xl font-bold text-stone-900 dark:text-stone-100"
           >
             {displayName(person)}
           </h2>

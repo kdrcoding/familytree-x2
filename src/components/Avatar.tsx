@@ -7,10 +7,11 @@ import { useT } from '../i18n/useT';
 
 interface AvatarProps {
   person: FamilyPerson;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
 }
 
 const SIZES = {
+  xs: 'h-8 w-8 text-[10px]',
   sm: 'h-10 w-10 text-xs',
   md: 'h-14 w-14 text-sm',
   lg: 'h-24 w-24 text-xl',
@@ -63,8 +64,10 @@ export function Avatar({ person, size = 'md' }: AvatarProps) {
         <><Icon className="mb-0.5 h-7 w-7" />{initials(person)}</>
       ) : size === 'md' ? (
         <><Icon className="mb-0.5 h-5 w-5" />{initials(person)}</>
-      ) : (
+      ) : size === 'sm' ? (
         <Icon className="h-5 w-5" />
+      ) : (
+        <Icon className="h-4 w-4" />
       )}
     </span>
   );

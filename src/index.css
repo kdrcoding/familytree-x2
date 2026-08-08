@@ -436,13 +436,21 @@ html.easy .tree-easy .react-flow__node-person {
 html.easy .tree-easy .tree-person-card {
   border-width: 2px;
   border-left-width: 6px;
+  overflow: hidden;
 }
+/* Keep type readable in Easy Mode but small enough that long names stay inside the card. */
 html.easy .tree-easy .tree-person-name {
-  font-size: 17px;
+  font-size: 14px;
   line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 html.easy .tree-easy .tree-person-meta {
-  font-size: 14px;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 html.easy .tree-easy .tree-branch-toggle {
   min-width: 34px;
@@ -476,12 +484,20 @@ html.easy .tree-easy .edge-child-flow {
   @apply rounded-xl border border-stone-200/80 bg-white/95 p-2.5 text-[11px] shadow-sm backdrop-blur dark:border-stone-700/80 dark:bg-stone-900/95;
 }
 
-/* Tree person cards — soft sage, compact on phones */
+/* Tree person cards — soft sage; clip so long names never spill out */
 .tree-person-card {
   background: var(--tree-card-bg, #f3f7f4);
+  overflow: hidden;
 }
 .dark .tree-person-card {
   background: rgb(28 25 23 / 0.92);
+}
+.tree-person-name,
+.tree-person-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 /* Tree action buttons (zoom-to-fit, zoom-readable) */

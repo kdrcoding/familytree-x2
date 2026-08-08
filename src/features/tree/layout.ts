@@ -6,9 +6,9 @@ import type { PersonIndex } from '../../utils/family';
 import { dnaPaletteForParents } from './dnaColor';
 import type { DnaPalette } from './dnaColor';
 
-// Compact cards so more of the tree fits on a phone screen without looking busy.
+// Fixed card size — text is truncated inside; never grow with long names.
 export const CARD_W = 200;
-export const CARD_H = 92;
+export const CARD_H = 96;
 
 export type TreeOrientation = 'vertical' | 'horizontal';
 export type TreeSpacing = 'comfortable' | 'compact';
@@ -20,8 +20,8 @@ const SPACING: Record<
 > = {
   // Tighter spouse/root gaps keep the oldest generation together; a taller
   // level gap leaves room for separate green bus lanes between rows.
-  comfortable: { spouse: 24, sibling: 32, level: 148, root: 40 },
-  compact: { spouse: 16, sibling: 18, level: 112, root: 24 },
+  comfortable: { spouse: 28, sibling: 36, level: 156, root: 44 },
+  compact: { spouse: 20, sibling: 22, level: 124, root: 28 },
 };
 
 const JUNCTION = 10;

@@ -7,6 +7,7 @@ import { usePrivacy } from '../../hooks/usePrivacy';
 import { useT } from '../../i18n/useT';
 import { lifespan } from '../../utils/dates';
 import { fullName } from '../../utils/family';
+import type { FamilyPerson } from '../../types/family';
 import { Avatar } from '../../components/Avatar';
 import { CARD_H, CARD_W } from './layout';
 import type { PersonFlowNode } from './layout';
@@ -21,6 +22,27 @@ const GENDER_ACCENT = {
 
 const HANDLE = '!h-1.5 !w-1.5 !min-h-0 !min-w-0 !border-0 !bg-transparent';
 
+/**
+ * Compact labels that always fit the card. Never use displayName (First "Nick" Last)
+ * — that string is what was spilling out of the box.
+ */
+function treeCardLabels(person: FamilyPerson): { title: string; line2?: string; line3?: string } {
+  const nick = person.nickname?.trim();
+  const first = person.firstName?.trim() || '';
+  const last = person.lastName?.trim() || '';
+
+  if (nick) {
+    // Short nickname is the hero; legal names go on clipped lines below.
+    return {
+      title: nick,
+      line2: first || undefined,
+      line3: last || undefined,
+    };
+  }
+  if (first && last) return { title: first, line2: last };
+  return { title: first || last || fullName(person) };
+}
+
 function PersonNodeComponent({ data }: NodeProps<PersonFlowNode>) {
   const { getPerson, getLabel } = useFamily();
   const privacy = usePrivacy();
@@ -30,6 +52,7 @@ function PersonNodeComponent({ data }: NodeProps<PersonFlowNode>) {
   if (!person) return null;
 
   const name = fullName(person);
+  const { title, line2, line3 } = treeCardLabels(person);
   const years = privacy.showBirthDate()
     ? lifespan(
         person.birthDate,
@@ -41,9 +64,14 @@ function PersonNodeComponent({ data }: NodeProps<PersonFlowNode>) {
     : person.isDeceased
       ? t('common.deceasedShort')
       : '';
+  // Prefer years; otherwise a role label only when we have spare line space.
+  const meta = years || (!line2 && !line3 ? getLabel(person) : '');
 
   return (
-    <div style={{ width: CARD_W, height: CARD_H }} className="relative">
+    <div
+      style={{ width: CARD_W, height: CARD_H }}
+      className="relative"
+    >
       <Handle type="target" position={Position.Top} id="top" className={HANDLE} />
       <Handle type="target" position={Position.Left} id="left" className={HANDLE} />
       <Handle type="source" position={Position.Right} id="right" className={HANDLE} />
@@ -54,7 +82,7 @@ function PersonNodeComponent({ data }: NodeProps<PersonFlowNode>) {
         onClick={() => onOpen(person.id)}
         aria-label={t('tree.openDetails', { name })}
         title={name}
-        className={`tree-person-card flex h-full w-full items-center gap-2 rounded-xl border border-l-[3px] px-2.5 text-left shadow-sm ring-1 ring-emerald-900/5 transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-brand-500 dark:ring-white/5 ${
+        className={`tree-person-card flex h-full w-full items-center gap-2 overflow-hidden rounded-xl border border-l-[3px] px-2 py-1.5 text-left shadow-sm ring-1 ring-emerald-900/5 transition-all active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-brand-500 dark:ring-white/5 ${
           GENDER_ACCENT[person.gender]
         } ${
           person.isDeceased
@@ -62,22 +90,26 @@ function PersonNodeComponent({ data }: NodeProps<PersonFlowNode>) {
             : 'border-emerald-200/80 dark:border-stone-700'
         }`}
       >
-        <Avatar person={person} size="sm" />
-        <span className="min-w-0 flex-1 py-0.5">
-          <span
-            className="tree-person-name block text-[13px] font-semibold leading-snug text-stone-800 dark:text-stone-100"
-            style={{
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-            }}
-          >
-            {name}
+        <Avatar person={person} size="xs" />
+        <span className="flex min-w-0 flex-1 flex-col justify-center overflow-hidden">
+          <span className="tree-person-name block w-full truncate text-[13px] font-semibold leading-tight text-stone-800 dark:text-stone-100">
+            {title}
           </span>
-          <span className="tree-person-meta mt-0.5 block truncate text-[11px] text-stone-500 dark:text-stone-400">
-            {years || (person.nickname ? `“${person.nickname}”` : getLabel(person))}
-          </span>
+          {line2 ? (
+            <span className="tree-person-meta mt-0.5 block w-full truncate text-[11px] font-medium leading-tight text-stone-600 dark:text-stone-300">
+              {line2}
+            </span>
+          ) : null}
+          {line3 ? (
+            <span className="tree-person-meta block w-full truncate text-[11px] font-medium leading-tight text-stone-600 dark:text-stone-300">
+              {line3}
+            </span>
+          ) : null}
+          {meta ? (
+            <span className="tree-person-meta mt-0.5 block w-full truncate text-[10px] leading-tight text-stone-500 dark:text-stone-400">
+              {meta}
+            </span>
+          ) : null}
         </span>
       </button>
 

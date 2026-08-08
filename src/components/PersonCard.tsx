@@ -5,7 +5,7 @@ import { usePrivacy } from '../hooks/usePrivacy';
 import { useLanguage, useT } from '../i18n/useT';
 import { countryLabel } from '../utils/countries';
 import { calculateAge, lifespan } from '../utils/dates';
-import { displayName } from '../utils/family';
+import { displayName, fullName } from '../utils/family';
 import { Avatar } from './Avatar';
 import { DeceasedBadge, GenderBadge, GenerationBadge } from './badges';
 
@@ -14,6 +14,16 @@ interface PersonCardProps {
   onOpen: (id: string) => void;
   onEdit?: (person: FamilyPerson) => void;
   onDelete?: (person: FamilyPerson) => void;
+}
+
+/** Short title for cards — avoid First "Nick" Last which overflows narrow layouts. */
+function cardTitle(person: FamilyPerson): { title: string; subtitle?: string } {
+  const nick = person.nickname?.trim();
+  const first = person.firstName?.trim() || '';
+  const last = person.lastName?.trim() || '';
+  if (nick) return { title: nick, subtitle: [first, last].filter(Boolean).join(' ') };
+  if (first && last) return { title: first, subtitle: last };
+  return { title: first || last || fullName(person) };
 }
 
 /** Card used in the Members grid. Click opens the full details panel. */
@@ -32,10 +42,11 @@ export function PersonCard({ person, onOpen, onEdit, onDelete }: PersonCardProps
         t('common.diedAbbr'),
       )
     : '';
+  const { title, subtitle } = cardTitle(person);
 
   return (
     <article
-      className={`card group relative flex flex-col gap-3 p-4 transition-shadow hover:shadow-md ${
+      className={`card group relative flex flex-col gap-3 overflow-hidden p-4 transition-shadow hover:shadow-md ${
         person.isDeceased ? 'border-dashed' : ''
       }`}
     >
@@ -45,13 +56,16 @@ export function PersonCard({ person, onOpen, onEdit, onDelete }: PersonCardProps
         className="absolute inset-0 rounded-2xl focus-visible:ring-2 focus-visible:ring-brand-500"
         aria-label={t('tree.openDetails', { name: displayName(person) })}
       />
-      <div className="flex items-start gap-3">
+      <div className="flex min-w-0 items-start gap-3">
         <Avatar person={person} />
-        <div className="min-w-0 flex-1">
-          <h3 className="truncate font-semibold text-stone-900 dark:text-stone-100">
-            {displayName(person)}
+        <div className="min-w-0 flex-1 overflow-hidden">
+          <h3 className="truncate font-semibold leading-snug text-stone-900 dark:text-stone-100" title={displayName(person)}>
+            {title}
           </h3>
-          <p className="text-xs text-stone-500 dark:text-stone-400">
+          {subtitle ? (
+            <p className="truncate text-xs font-medium text-stone-600 dark:text-stone-300">{subtitle}</p>
+          ) : null}
+          <p className="truncate text-xs text-stone-500 dark:text-stone-400">
             {getLabel(person)}
             {years && ` · ${years}`}
             {age !== null &&

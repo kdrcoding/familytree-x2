@@ -308,8 +308,15 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
         if (!isOwner) return;
         void mutate((current) => setDivorced(current, aId, bId, divorced), 'divorce');
       },
-      deletePerson: (id) => mutate((current) => removePerson(current, id), 'delete'),
-      replaceAll: (newPeople) => mutate(() => normalizePeople(newPeople), 'import'),
+      deletePerson: (id) => {
+        // Deleting people is owner-only (family editors can add/edit details).
+        if (!isOwner) return Promise.resolve(false);
+        return mutate((current) => removePerson(current, id), 'delete');
+      },
+      replaceAll: (newPeople) => {
+        if (!isOwner) return Promise.resolve(false);
+        return mutate(() => normalizePeople(newPeople), 'import');
+      },
       bulkSetPhotos: (updates) =>
         mutate(
           (current) =>
@@ -327,11 +334,13 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
             }),
           'edit',
         ),
-      resetToSample: () =>
-        mutate(() => DEFAULT_DATA, 'reset').then((saved) => {
+      resetToSample: () => {
+        if (!isOwner) return Promise.resolve(false);
+        return mutate(() => DEFAULT_DATA, 'reset').then((saved) => {
           if (saved) void markSeeded('default-dataset');
           return saved;
-        }),
+        });
+      },
       exportData: () => ({
         version: FAMILY_DATA_VERSION,
         exportedAt: new Date().toISOString(),

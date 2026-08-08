@@ -4,14 +4,13 @@ import {
   Background,
   BackgroundVariant,
   Controls,
-  MiniMap,
   Panel,
   ReactFlow,
   ReactFlowProvider,
   useReactFlow,
 } from '@xyflow/react';
 import type { Edge, EdgeTypes, Node, NodeTypes, ReactFlowInstance } from '@xyflow/react';
-import { Lock, LockOpen, Map, Maximize2, Search, UserPlus, UserRoundPlus, Users, X, Share2, ZoomIn } from 'lucide-react';
+import { Lock, LockOpen, Maximize2, Search, UserPlus, UserRoundPlus, Users, X, Share2, ZoomIn } from 'lucide-react';
 import type { FamilyPerson, RelationLink } from '../types/family';
 import { useAuth } from '../context/AuthContext';
 import { useConfirm } from '../context/ConfirmContext';
@@ -187,7 +186,6 @@ function TreeCanvas({
   const t = useT();
   const { settings } = useSettings();
   const dark = settings.theme === 'dark';
-  const [minimapOpen, setMinimapOpen] = useState(false);
   const [legendOpen, setLegendOpen] = useState(false);
   const [isPhone, setIsPhone] = useState(
     () => typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches,
@@ -201,10 +199,7 @@ function TreeCanvas({
   }, []);
 
   useEffect(() => {
-    if (easyMode) {
-      setMinimapOpen(false);
-      setLegendOpen(false);
-    }
+    if (easyMode) setLegendOpen(false);
   }, [easyMode]);
   const didInitialFocus = useRef(false);
   const startZoom = easyMode ? START_ZOOM_EASY : isPhone ? START_ZOOM_PHONE : START_ZOOM;
@@ -378,28 +373,6 @@ function TreeCanvas({
         position="bottom-right"
         className={`family-tree-controls !mb-[4.5rem] !mr-1.5 overflow-hidden rounded-xl border border-stone-200/90 shadow-md sm:!mb-16 sm:!mr-2 lg:!mb-3 lg:!mr-3 ${easyMode ? 'tree-controls-easy' : ''}`}
       />
-
-      <Panel position="bottom-right" className="!bottom-16 !right-3 hidden md:block">
-        <button
-          type="button"
-          onClick={() => setMinimapOpen((v) => !v)}
-          className="tree-action-btn inline-flex items-center gap-1.5 px-2.5 py-1.5"
-          aria-pressed={minimapOpen}
-        >
-          <Map className="h-3.5 w-3.5" aria-hidden />
-          {minimapOpen ? t('tree.minimapHide') : t('tree.minimapShow')}
-        </button>
-      </Panel>
-      {minimapOpen && (
-        <MiniMap
-          className="!hidden !bottom-24 !overflow-hidden !rounded-xl !border !border-stone-200 !shadow-md md:!block dark:!border-stone-700"
-          pannable
-          zoomable
-          nodeStrokeWidth={3}
-          nodeColor={dark ? '#78716c' : '#a8a29e'}
-          maskColor={dark ? 'rgb(0 0 0 / 0.45)' : 'rgb(68 64 60 / 0.12)'}
-        />
-      )}
     </ReactFlow>
   );
 }
@@ -700,7 +673,8 @@ export function TreePage() {
           personId={detailsId}
           onClose={() => setDetailsId(null)}
           onNavigate={(id) => setDetailsId(id)}
-          editMode={editMode}
+          // Editors get Edit without turning on tree Edit Mode; delete stays owner-only.
+          editMode={canEdit}
           canDelete={canDelete}
           onEdit={(person) => {
             setDetailsId(null);

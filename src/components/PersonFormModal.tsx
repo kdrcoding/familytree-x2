@@ -716,6 +716,15 @@ export function PersonFormModal({
               autoComplete="family-name"
             />
           </Field>
+          <Field label={t('form.nickname')}>
+            <input
+              type="text"
+              className="input"
+              value={values.nickname}
+              onChange={(e) => set('nickname', e.target.value)}
+              placeholder={t('form.nicknameHint')}
+            />
+          </Field>
           <Field label={t('form.gender')}>
             <select
               className="input"
@@ -744,16 +753,8 @@ export function PersonFormModal({
             {t('form.moreDetails')}
           </summary>
           <div className="grid grid-cols-1 gap-3 border-t border-stone-200 p-3 sm:grid-cols-2 sm:gap-4 sm:p-4 dark:border-stone-700">
-            <Field label={t('form.nickname')}>
-              <input
-                type="text"
-                className="input"
-                value={values.nickname}
-                onChange={(e) => set('nickname', e.target.value)}
-              />
-            </Field>
             <div>
-              <label className="flex h-full items-center gap-2 pt-1 text-sm text-stone-700 sm:pt-6 dark:text-stone-300">
+              <label className="flex h-full items-center gap-2 pt-1 text-sm text-stone-700 sm:pt-2 dark:text-stone-300">
                 <input
                   type="checkbox"
                   className="h-4 w-4 rounded border-stone-300 text-brand-600 focus:ring-brand-500"
