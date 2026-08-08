@@ -426,7 +426,7 @@ export const ruOverrides: Record<string, string> = {
   'tree.print': 'Печать',
   'tree.printTitle': 'Распечатать постер древа',
   'tree.share': 'Поделиться',
-  'tree.shareTitle': 'Поделиться постером древа',
+  'tree.shareTitle': 'Поделиться или сохранить картинку древа',
   'tree.shareText': 'Постер нашего семейного древа',
   'tree.shareDone': 'Постер отправлен.',
   'tree.focusBranch': 'Только эта ветвь',

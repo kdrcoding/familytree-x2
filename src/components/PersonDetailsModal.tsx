@@ -24,7 +24,6 @@ import { Avatar } from './Avatar';
 import { DeceasedBadge, GenderBadge, GenerationBadge } from './badges';
 import { MemoriesSection } from './MemoriesSection';
 import { AudioStoriesSection } from './AudioStoriesSection';
-import { OverflowMenu } from './OverflowMenu';
 import { Modal } from './ui/Modal';
 
 interface PersonDetailsModalProps {
@@ -237,16 +236,15 @@ export function PersonDetailsModal({
           </div>
         </div>
         {onCopyLink && (
-          <OverflowMenu
-            items={[
-              {
-                id: 'copy',
-                label: t('tree.copyLink'),
-                icon: <LinkIcon className="h-4 w-4" aria-hidden />,
-                onClick: () => onCopyLink(person),
-              },
-            ]}
-          />
+          <button
+            type="button"
+            className="icon-btn !min-h-10 !min-w-10 shrink-0"
+            onClick={() => onCopyLink(person)}
+            aria-label={t('tree.copyLink')}
+            title={t('tree.copyLink')}
+          >
+            <LinkIcon className="h-4 w-4" aria-hidden />
+          </button>
         )}
       </div>
 

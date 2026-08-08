@@ -15,9 +15,28 @@ export interface OverflowMenuItem {
 
 type Coords = { top: number; left: number; minWidth: number };
 
+/** Above Leaflet map panes (~400–1000) and React Flow chrome. */
+const MENU_Z = 10000;
+
+function placeMenu(
+  btn: HTMLElement,
+  menu: HTMLElement | null,
+  align: 'left' | 'right',
+): Coords {
+  const r = btn.getBoundingClientRect();
+  const menuW = Math.max(200, menu?.offsetWidth ?? 200);
+  const menuH = menu?.offsetHeight ?? 160;
+  const gap = 6;
+  let left = align === 'right' ? r.right - menuW : r.left;
+  left = Math.max(8, Math.min(left, window.innerWidth - menuW - 8));
+  const below = r.bottom + gap;
+  const top =
+    below + menuH > window.innerHeight - 8 ? Math.max(8, r.top - gap - menuH) : below;
+  return { top, left, minWidth: menuW };
+}
+
 /**
- * Compact ⋮ menu for secondary actions. Renders in a portal with fixed
- * positioning so the tree canvas (or any overflow parent) cannot hide it.
+ * Compact ⋮ menu. Always portals to document.body with a z-index above maps.
  */
 export function OverflowMenu({
   items,
@@ -36,24 +55,17 @@ export function OverflowMenu({
   const visible = items.filter(Boolean);
 
   const place = useCallback(() => {
-    const btn = btnRef.current;
-    if (!btn) return;
-    const r = btn.getBoundingClientRect();
-    const menuW = Math.max(200, menuRef.current?.offsetWidth ?? 200);
-    const menuH = menuRef.current?.offsetHeight ?? 180;
-    const gap = 6;
-    let left = align === 'right' ? r.right - menuW : r.left;
-    left = Math.max(8, Math.min(left, window.innerWidth - menuW - 8));
-    const below = r.bottom + gap;
-    const top =
-      below + menuH > window.innerHeight - 8 ? Math.max(8, r.top - gap - menuH) : below;
-    setCoords({ top, left, minWidth: menuW });
+    if (!btnRef.current) return;
+    setCoords(placeMenu(btnRef.current, menuRef.current, align));
   }, [align]);
 
   useLayoutEffect(() => {
     if (!open) return;
     place();
-  }, [open, place]);
+    // Re-measure after paint so real menu height can flip above if needed.
+    const id = requestAnimationFrame(() => place());
+    return () => cancelAnimationFrame(id);
+  }, [open, place, visible.length]);
 
   useEffect(() => {
     if (!open) return;
@@ -66,7 +78,7 @@ export function OverflowMenu({
       if (e.key === 'Escape') setOpen(false);
     };
     document.addEventListener('mousedown', onDoc);
-    document.addEventListener('touchstart', onDoc);
+    document.addEventListener('touchstart', onDoc, { passive: true });
     document.addEventListener('keydown', onKey);
     window.addEventListener('resize', place);
     window.addEventListener('scroll', place, true);
@@ -91,7 +103,9 @@ export function OverflowMenu({
         aria-expanded={open}
         aria-haspopup="menu"
         onClick={() => {
-          if (!open) place();
+          if (!open && btnRef.current) {
+            setCoords(placeMenu(btnRef.current, null, align));
+          }
           setOpen((v) => !v);
         }}
       >
@@ -103,8 +117,13 @@ export function OverflowMenu({
           <ul
             ref={menuRef}
             role="menu"
-            style={{ top: coords.top, left: coords.left, minWidth: coords.minWidth }}
-            className="fixed z-[200] overflow-hidden rounded-2xl border border-stone-200/90 bg-white py-1.5 shadow-2xl shadow-stone-900/20 dark:border-stone-600 dark:bg-stone-900 dark:shadow-black/50"
+            style={{
+              top: coords.top,
+              left: coords.left,
+              minWidth: coords.minWidth,
+              zIndex: MENU_Z,
+            }}
+            className="fixed overflow-hidden rounded-2xl border border-stone-200/90 bg-white py-1.5 shadow-2xl shadow-stone-900/25 dark:border-stone-600 dark:bg-stone-900 dark:shadow-black/60"
           >
             {visible.map((item) => (
               <li key={item.id} role="none">
@@ -131,5 +150,79 @@ export function OverflowMenu({
           document.body,
         )}
     </>
+  );
+}
+
+/**
+ * Same portal + z-index rules for any custom trigger (e.g. nav "More").
+ */
+export function PortalMenu({
+  open,
+  onClose,
+  anchorRef,
+  align = 'right',
+  children,
+}: {
+  open: boolean;
+  onClose: () => void;
+  anchorRef: React.RefObject<HTMLElement | null>;
+  align?: 'left' | 'right';
+  children: ReactNode;
+}) {
+  const [coords, setCoords] = useState<Coords | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const place = useCallback(() => {
+    if (!anchorRef.current) return;
+    setCoords(placeMenu(anchorRef.current, menuRef.current, align));
+  }, [anchorRef, align]);
+
+  useLayoutEffect(() => {
+    if (!open) return;
+    place();
+    const id = requestAnimationFrame(() => place());
+    return () => cancelAnimationFrame(id);
+  }, [open, place]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as Node;
+      if (anchorRef.current?.contains(target) || menuRef.current?.contains(target)) return;
+      onClose();
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('mousedown', onDoc);
+    document.addEventListener('touchstart', onDoc, { passive: true });
+    document.addEventListener('keydown', onKey);
+    window.addEventListener('resize', place);
+    window.addEventListener('scroll', place, true);
+    return () => {
+      document.removeEventListener('mousedown', onDoc);
+      document.removeEventListener('touchstart', onDoc);
+      document.removeEventListener('keydown', onKey);
+      window.removeEventListener('resize', place);
+      window.removeEventListener('scroll', place, true);
+    };
+  }, [open, onClose, place, anchorRef]);
+
+  if (!open || !coords) return null;
+
+  return createPortal(
+    <div
+      ref={menuRef}
+      style={{
+        top: coords.top,
+        left: coords.left,
+        minWidth: coords.minWidth,
+        zIndex: MENU_Z,
+      }}
+      className="fixed overflow-hidden rounded-xl border border-stone-200 bg-white py-1 shadow-xl dark:border-stone-700 dark:bg-stone-900"
+    >
+      {children}
+    </div>,
+    document.body,
   );
 }

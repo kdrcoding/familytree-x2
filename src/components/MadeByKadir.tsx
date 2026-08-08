@@ -74,7 +74,7 @@ export function MadeByKadir({ align = 'center' }: { align?: 'center' | 'left' })
         <div
           role="dialog"
           aria-label={t('credit.contactTitle')}
-          className={`absolute bottom-full z-50 mb-3 w-72 animate-modal-in rounded-2xl border border-stone-200 bg-white p-4 text-left shadow-xl dark:border-stone-700 dark:bg-stone-900 ${
+          className={`absolute bottom-full z-[10000] mb-3 w-72 animate-modal-in rounded-2xl border border-stone-200 bg-white p-4 text-left shadow-xl dark:border-stone-700 dark:bg-stone-900 ${
             align === 'center' ? 'left-1/2 -translate-x-1/2' : 'left-0'
           }`}
         >

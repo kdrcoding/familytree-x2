@@ -11,7 +11,7 @@ import {
   useReactFlow,
 } from '@xyflow/react';
 import type { Edge, EdgeTypes, Node, NodeTypes, ReactFlowInstance } from '@xyflow/react';
-import { Lock, LockOpen, Map, Maximize2, Search, UserPlus, UserRoundPlus, Users, X, Download, Printer, Share2, ZoomIn } from 'lucide-react';
+import { Lock, LockOpen, Map, Maximize2, Search, UserPlus, UserRoundPlus, Users, X, Share2, ZoomIn } from 'lucide-react';
 import type { FamilyPerson, RelationLink } from '../types/family';
 import { useAuth } from '../context/AuthContext';
 import { useConfirm } from '../context/ConfirmContext';
@@ -28,11 +28,10 @@ import { JoinFamilyModal } from '../components/JoinFamilyModal';
 import { PersonDetailsModal } from '../components/PersonDetailsModal';
 import { PersonFormModal } from '../components/PersonFormModal';
 import { UnlockModal } from '../components/UnlockModal';
-import { OverflowMenu } from '../components/OverflowMenu';
 import { BrandMark } from '../components/BrandLogo';
 import { Avatar } from '../components/Avatar';
 import { computeTreeLayout, CARD_H, CARD_W } from '../features/tree/layout';
-import { exportTreeAsPng, printTreePoster, shareTreePoster } from '../features/tree/exportPng';
+import { shareTreePoster } from '../features/tree/exportPng';
 import { JunctionNode } from '../features/tree/JunctionNode';
 import { GenLabelNode } from '../features/tree/GenLabelNode';
 import { ChildEdge } from '../features/tree/ChildEdge';
@@ -469,26 +468,18 @@ export function TreePage() {
     [layout],
   );
 
-  const runExport = async (mode: 'png' | 'print' | 'share') => {
-    if (exportBusy) return;
+  const sharePoster = async () => {
+    if (exportBusy || flowNodes.length === 0) return;
     setExportBusy(true);
     try {
-      const opts = {
+      const result = await shareTreePoster({
         nodes: flowNodes,
         darkMode: settings.theme === 'dark',
         filename: 'family-tree.png',
         title: t('site.title'),
         text: t('tree.shareText'),
-      };
-      if (mode === 'png') {
-        await exportTreeAsPng(opts);
-        toast(t('tree.pngDone'), 'success');
-      } else if (mode === 'print') {
-        await printTreePoster(opts);
-      } else {
-        const result = await shareTreePoster(opts);
-        toast(result === 'shared' ? t('tree.shareDone') : t('tree.pngDone'), 'success');
-      }
+      });
+      toast(result === 'shared' ? t('tree.shareDone') : t('tree.pngDone'), 'success');
     } catch (error) {
       console.error(error);
       toast(t('tree.pngFail'), 'error');
@@ -636,6 +627,25 @@ export function TreePage() {
             )}
             <button
               type="button"
+              className="icon-btn !min-h-10 !min-w-10"
+              onClick={() => setJoinOpen(true)}
+              aria-label={t('tree.addYourself')}
+              title={t('tree.addYourself')}
+            >
+              <UserRoundPlus className="h-4 w-4" aria-hidden />
+            </button>
+            <button
+              type="button"
+              className="icon-btn !min-h-10 !min-w-10"
+              onClick={() => void sharePoster()}
+              disabled={exportBusy || flowNodes.length === 0}
+              aria-label={t('tree.share')}
+              title={t('tree.shareTitle')}
+            >
+              <Share2 className="h-4 w-4" aria-hidden />
+            </button>
+            <button
+              type="button"
               className={`${editMode ? 'btn-primary' : 'btn-secondary'} !min-h-10 !min-w-10 !px-2.5 sm:!px-3`}
               onClick={() => {
                 if (!canEdit) setUnlockOpen(true);
@@ -654,37 +664,6 @@ export function TreePage() {
                 {editMode ? t('tree.editing') : t('tree.editMode')}
               </span>
             </button>
-            <OverflowMenu
-              items={[
-                {
-                  id: 'join',
-                  label: t('tree.addYourself'),
-                  icon: <UserRoundPlus className="h-4 w-4" aria-hidden />,
-                  onClick: () => setJoinOpen(true),
-                },
-                {
-                  id: 'share',
-                  label: t('tree.share'),
-                  icon: <Share2 className="h-4 w-4" aria-hidden />,
-                  onClick: () => void runExport('share'),
-                  disabled: exportBusy || flowNodes.length === 0,
-                },
-                {
-                  id: 'png',
-                  label: t('tree.pngTitle'),
-                  icon: <Download className="h-4 w-4" aria-hidden />,
-                  onClick: () => void runExport('png'),
-                  disabled: exportBusy || flowNodes.length === 0,
-                },
-                {
-                  id: 'print',
-                  label: t('tree.print'),
-                  icon: <Printer className="h-4 w-4" aria-hidden />,
-                  onClick: () => void runExport('print'),
-                  disabled: exportBusy || flowNodes.length === 0,
-                },
-              ]}
-            />
           </div>
         </div>
       </div>

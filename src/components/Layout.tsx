@@ -9,13 +9,14 @@ import { MadeByKadir } from './MadeByKadir';
 import { BottomNav } from './BottomNav';
 import { PageSkeleton } from './PageSkeleton';
 import { BrandLogo } from './BrandLogo';
+import { PortalMenu } from './OverflowMenu';
 
 export function Layout() {
   const { settings, toggleTheme, setLanguage } = useSettings();
   const { role } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
-  const moreRef = useRef<HTMLDivElement>(null);
+  const moreBtnRef = useRef<HTMLButtonElement>(null);
   const location = useLocation();
   const t = useT();
   const isTreePage = location.pathname === '/tree';
@@ -26,34 +27,14 @@ export function Layout() {
     setMoreOpen(false);
   }, [location.pathname]);
 
-  useEffect(() => {
-    if (!moreOpen) return;
-    const onDoc = (e: MouseEvent | TouchEvent) => {
-      if (!moreRef.current?.contains(e.target as Node)) setMoreOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMoreOpen(false);
-    };
-    document.addEventListener('mousedown', onDoc);
-    document.addEventListener('touchstart', onDoc);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onDoc);
-      document.removeEventListener('touchstart', onDoc);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [moreOpen]);
-
   const cycleLanguage = () => setLanguage(nextLanguage(settings.language));
 
-  // Compact primary: Home / Tree / Members — Settings is the gear icon.
   const primaryNav = [
     { to: '/', label: t('nav.home') },
     { to: '/tree', label: t('nav.tree') },
     { to: '/members', label: t('nav.members') },
   ];
 
-  // Secondary pages under More (map/stats/about stay out of easy mode).
   const moreNav = [
     { to: '/related', label: t('nav.related'), easy: true },
     { to: '/timeline', label: t('nav.timeline'), easy: true },
@@ -97,7 +78,6 @@ export function Layout() {
             className="flex min-w-0 items-center gap-2"
             onClick={() => setMenuOpen(false)}
           >
-            {/* Mark always; wordmark from sm up — keeps the bar compact on phones */}
             <span className="sm:hidden">
               <BrandLogo size="sm" wordmark={false} />
             </span>
@@ -113,8 +93,9 @@ export function Layout() {
               </NavLink>
             ))}
             {moreNav.length > 0 && (
-              <div className="relative" ref={moreRef}>
+              <>
                 <button
+                  ref={moreBtnRef}
                   type="button"
                   className={linkClass({ isActive: moreOpen })}
                   aria-expanded={moreOpen}
@@ -123,28 +104,30 @@ export function Layout() {
                   {t('nav.more')}
                   <ChevronDown className="ml-0.5 inline h-4 w-4" aria-hidden />
                 </button>
-                {moreOpen && (
-                  <ul className="absolute right-0 z-50 mt-1 min-w-[11rem] overflow-hidden rounded-xl border border-stone-200 bg-white py-1 shadow-lg dark:border-stone-700 dark:bg-stone-900">
-                    {moreNav.map((item) => (
-                      <li key={item.to}>
-                        <NavLink
-                          to={item.to}
-                          className={({ isActive }) =>
-                            `block px-3.5 py-2 text-sm font-medium ${
-                              isActive
-                                ? 'bg-brand-50 text-brand-900 dark:bg-brand-950/50 dark:text-brand-200'
-                                : 'text-stone-800 hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-stone-800'
-                            }`
-                          }
-                          onClick={() => setMoreOpen(false)}
-                        >
-                          {item.label}
-                        </NavLink>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+                <PortalMenu
+                  open={moreOpen}
+                  onClose={() => setMoreOpen(false)}
+                  anchorRef={moreBtnRef}
+                  align="right"
+                >
+                  {moreNav.map((item) => (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      className={({ isActive }) =>
+                        `block px-3.5 py-2.5 text-sm font-medium ${
+                          isActive
+                            ? 'bg-brand-50 text-brand-900 dark:bg-brand-950/50 dark:text-brand-200'
+                            : 'text-stone-800 hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-stone-800'
+                        }`
+                      }
+                      onClick={() => setMoreOpen(false)}
+                    >
+                      {item.label}
+                    </NavLink>
+                  ))}
+                </PortalMenu>
+              </>
             )}
           </nav>
 
