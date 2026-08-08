@@ -37,7 +37,6 @@ import { uploadPhoto } from '../lib/photoStorage';
 import { normalizeCountry } from '../utils/countries';
 import { downscalePhoto } from '../utils/image';
 import { ToggleSwitch } from '../components/ui/ToggleSwitch';
-import { JoinRequestsCard } from '../components/JoinRequestsCard';
 import { UnlockModal } from '../components/UnlockModal';
 
 /** Translated label for a changed field in the change log. */
@@ -754,7 +753,6 @@ export function SettingsPage() {
         </div>
       </section>
 
-      <JoinRequestsCard />
       <ChangeLogCard />
       <BackupsCard />
       <PhotosCard />

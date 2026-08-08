@@ -65,14 +65,19 @@ export const ruOverrides: Record<string, string> = {
   'home.downloadCalendar': 'В мой календарь',
 
   'gate.title': 'Семейный сайт',
-  'gate.intro': 'Введите своё имя и семейный пароль, чтобы открыть древо.',
+  'gate.intro': 'Введите семейный пароль, чтобы открыть древо. Если пароля нет — спросите у владельца сайта.',
   'gate.yourName': 'Ваше имя',
+  'gate.namePlaceholder': 'например, Азиза',
   'gate.password': 'Пароль',
   'gate.btn': 'Войти',
   'gate.checking': 'Проверка…',
   'gate.enter': 'Введите пароль.',
   'gate.wrong': 'Неверный пароль.',
   'gate.nameRequired': 'Пожалуйста, введите имя.',
+  'gate.welcomeTitle': 'Добро пожаловать в семью',
+  'gate.welcomeIntro': 'Одно короткое поле — чтобы мы знали, кто зашёл.',
+  'gate.welcomeBtn': 'Продолжить',
+  'gate.nameHint': 'Только для журнала изменений — это не логин.',
 
   'settings.title': 'Настройки',
   'settings.easyTitle': 'Простой режим',
@@ -182,8 +187,6 @@ export const ruOverrides: Record<string, string> = {
   'common.diedAbbr': 'ум.',
   'common.deceasedShort': 'Умер(ла)',
 
-  'gate.nameHint': 'Чтобы семья видела, кто внёс каждое изменение.',
-
   'home.bdaysNone': 'В ближайшие {days} дн. дней рождения нет.',
   'home.bdayTurns': 'исполняется {age}',
   'home.bdayTurnsToday': 'сегодня исполняется {age}',
@@ -266,9 +269,10 @@ export const ruOverrides: Record<string, string> = {
   'form.save': 'Сохранить',
   'form.add': 'Добавить',
   'form.saveAnother': 'Сохранить и добавить ещё',
-  'form.addMe': 'Отправить заявку',
+  'form.addMe': 'Добавить меня в древо',
   'form.addedToast': '{name} добавлен(а) в семью.',
   'form.updatedToast': '{name} обновлён(а).',
+  'form.selfJoinAddedToast': '{name} добавлен(а) в семейное древо.',
   'form.selfJoinToast':
     'Заявка отправлена. Владелец семьи проверит её и добавит вас в древо.',
   'form.selfJoinFailed':
@@ -302,7 +306,7 @@ export const ruOverrides: Record<string, string> = {
 
   'join.title': 'Добавить себя в семейное древо',
   'join.intro':
-    'Укажите данные и как вы связаны. Заявка уйдёт владельцу — вы появитесь в древе после одобрения.',
+    'Укажите, как вы связаны, затем заполните данные. Вы сразу поянитесь в древе.',
   'join.howRelated': 'Как вы связаны? Я…',
   'join.kindChild': 'ребёнок',
   'join.kindSpouse': 'супруг(а) / партнёр(ша)',
@@ -312,7 +316,7 @@ export const ruOverrides: Record<string, string> = {
   'join.searchRelative': 'Найдите родственника…',
   'join.searchLabel': 'Поиск человека, с которым вы связаны',
   'join.noMatches': 'Никого не найдено.',
-  'join.notSure': 'Не уверен(а), как связан(а) — пусть владелец разместит',
+  'join.notSure': 'Не уверен(а), как связан(а) — добавить пока без связи',
   'join.continue': 'Далее к моим данным',
 
   'joinReq.title': 'Заявки на добавление',
@@ -483,13 +487,13 @@ export const ruOverrides: Record<string, string> = {
   'notify.digestTitle': 'Shajira — новости семьи',
   'notify.settingsTitle': 'Напоминания',
   'notify.settingsIntro':
-    'Колокольчик в шапке — дни рождения, заявки и новые истории.',
+    'Колокольчик в шапке — дни рождения и новые истории.',
   'notify.browserLabel': 'Напоминания в браузере',
   'notify.browserDesc': 'Системное уведомление о днях рождения при открытии сайта.',
 
   'invite.title': 'Пригласить родственников',
   'invite.intro':
-    'Поделитесь этой ссылкой. После ввода семейного пароля откроется «Добавить себя».',
+    'Поделитесь этой ссылкой. После ввода семейного пароля откроется «Добавить себя» — они сразу появятся в древе.',
   'invite.copyBtn': 'Скопировать ссылку-приглашение',
   'invite.copied': 'Ссылка-приглашение скопирована.',
   'invite.openedToast': 'Добро пожаловать — добавьте себя в семейное древо.',

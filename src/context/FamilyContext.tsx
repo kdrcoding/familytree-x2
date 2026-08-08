@@ -279,8 +279,8 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
           const existing = current.find((p) => p.id === person.id);
           if (!existing) return current;
           if (!isOwner) {
-            // Family editors may change detail fields (names, dates, place,
-            // bio, gender) but never relationships, deletion, or deceased status.
+            // Family editors may change detail fields; relationships, divorce,
+            // and deceased status stay owner-controlled (matches DB policies).
             const updated = {
               ...person,
               isDeceased: existing.isDeceased,
@@ -294,8 +294,6 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
             return current.map((p) => (p.id === person.id ? updated : p));
           }
           const replaced = current.map((p) => (p.id === person.id ? person : p));
-          // Mirror marriage dates onto each spouse so both records agree —
-          // the relationship row is derived from either side.
           return syncMarriageDates(
             setRelationships(replaced, person.id, parentIds, spouseIds),
             person.id,

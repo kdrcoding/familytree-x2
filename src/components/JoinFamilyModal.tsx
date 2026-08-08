@@ -19,8 +19,8 @@ interface JoinFamilyModalProps {
 }
 
 /**
- * Public "Add yourself" flow. Step 1 asks how the visitor connects; step 2
- * is the person form, which submits a pending join request for the owner.
+ * "Add yourself" flow for logged-in family. Step 1 picks how they connect;
+ * step 2 saves them onto the live tree immediately (no owner approval).
  */
 export function JoinFamilyModal({ onClose }: JoinFamilyModalProps) {
   const { people, getLabel } = useFamily();

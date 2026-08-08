@@ -404,7 +404,7 @@ export function TreePage() {
   );
   const collapsed = useMemo(() => new Set(collapsedList), [collapsedList]);
 
-  const [editMode, setEditMode] = useState(false);
+  const [editMode, setEditMode] = useState(canEdit);
   const [unlockOpen, setUnlockOpen] = useState(false);
   const [joinOpen, setJoinOpen] = useState(false);
   const [detailsId, setDetailsId] = useState<string | null>(null);
@@ -414,8 +414,9 @@ export function TreePage() {
   const [exportBusy, setExportBusy] = useState(false);
 
   useEffect(() => {
-    if (!canEdit && editMode) setEditMode(false);
-  }, [canEdit, editMode]);
+    // Password gate already signed them in — edit tools are ready right away.
+    setEditMode(canEdit);
+  }, [canEdit]);
 
   // Invite / join deep link: ?join=1 or ?invite=1 opens Add yourself.
   useEffect(() => {

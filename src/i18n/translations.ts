@@ -104,9 +104,13 @@ export const en = {
   'gate.checking': 'Checking…',
   'gate.wrong': 'Wrong password.',
   'gate.enter': 'Please enter the password.',
-  'gate.yourName': 'Your name',
-  'gate.nameHint': 'So the family knows who made each change.',
-  'gate.nameRequired': 'Please enter your name.',
+  'gate.welcomeTitle': 'Welcome to the family',
+  'gate.welcomeIntro': 'One quick thing before you look around — just so we know who is browsing.',
+  'gate.welcomeBtn': 'Continue',
+  'gate.yourName': 'Your first name',
+  'gate.namePlaceholder': 'e.g. Aziza',
+  'gate.nameHint': 'Only used in the family change log — not a login username.',
+  'gate.nameRequired': 'Please enter your first name.',
   'log.by': 'by',
   'log.showAll': 'Show all ({count})',
   'log.showLess': 'Show less',
@@ -279,14 +283,14 @@ export const en = {
   'notify.digestTitle': 'Shajira — family updates',
   'notify.settingsTitle': 'Reminders',
   'notify.settingsIntro':
-    'Use the bell in the header for birthdays, join requests and new stories.',
+    'Use the bell in the header for birthdays and new stories.',
   'notify.browserLabel': 'Browser birthday reminders',
   'notify.browserDesc': 'Show a system notification for birthdays when you open the site.',
 
   // Invite link
   'invite.title': 'Invite relatives',
   'invite.intro':
-    'Share this link. After they enter the family password, “Add yourself” opens so they can send a join request.',
+    'Share this link. After they enter the family password, “Add yourself” opens so they can join the tree right away.',
   'invite.copyBtn': 'Copy invite link',
   'invite.copied': 'Invite link copied.',
   'invite.openedToast': 'Welcome — add yourself to the family tree.',
@@ -421,7 +425,7 @@ export const en = {
   'form.add': 'Add person',
   'form.saveAnother': 'Save & add another',
   'form.saveAnotherTitle': 'Save this person and immediately start the next one',
-  'form.addMe': 'Send my request',
+  'form.addMe': 'Add me to the tree',
   'form.addedToast': '{name} was added to the family.',
   'form.updatedToast': '{name} was updated.',
   'form.draftRestored': 'Restored the unsaved changes you were making here.',
@@ -429,6 +433,7 @@ export const en = {
   'form.duplicateMessage': '{name} already has the same name and birth date. Add another person anyway?',
   'form.duplicateContinue': 'Add anyway',
   'form.updatedRestrictedToast': '{name} was updated — only empty fields were filled in.',
+  'form.selfJoinAddedToast': '{name} was added to the family tree.',
   'form.selfJoinToast':
     'Your request was sent. The family owner will review it and add you to the tree.',
   'form.selfJoinFailed':
@@ -438,7 +443,7 @@ export const en = {
   // Join ("Add yourself")
   'join.title': 'Add yourself to the family tree',
   'join.intro':
-    'Fill in your details and how you connect. Your request goes to the family owner for approval — you will appear on the tree once they accept it.',
+    'Say how you connect, then fill in your details. You will appear on the tree right away.',
   'join.howRelated': 'How are you related? I am…',
   'join.kindChild': 'a child of',
   'join.kindSpouse': 'the spouse / partner of',
@@ -448,7 +453,7 @@ export const en = {
   'join.searchRelative': 'Search for your relative…',
   'join.searchLabel': 'Search for the person you are related to',
   'join.noMatches': 'No matching people.',
-  'join.notSure': "I'm not sure how I connect — let the owner place me",
+  'join.notSure': "I'm not sure how I connect — add me without a link for now",
   'join.continue': 'Continue to my details',
 
   // Owner join-request inbox
@@ -885,8 +890,12 @@ export const uz: Record<TKey, string> = {
   'gate.checking': 'Tekshirilmoqda…',
   'gate.wrong': "Parol noto'g'ri.",
   'gate.enter': 'Iltimos, parolni kiriting.',
+  'gate.welcomeTitle': 'Oilaga xush kelibsiz',
+  'gate.welcomeIntro': "Birgina narsa — kim saytda ekanini bilishimiz uchun.",
+  'gate.welcomeBtn': 'Davom etish',
   'gate.yourName': 'Ismingiz',
-  'gate.nameHint': "Har bir o'zgarishni kim qilganini oila bilishi uchun.",
+  'gate.namePlaceholder': 'masalan, Aziza',
+  'gate.nameHint': "Faqat o'zgarishlar jurnalida ko'rinadi — bu login emas.",
   'gate.nameRequired': 'Iltimos, ismingizni kiriting.',
   'log.by': '·',
   'log.showAll': "Hammasini ko'rsatish ({count})",
@@ -1056,13 +1065,13 @@ export const uz: Record<TKey, string> = {
   'notify.digestTitle': 'Shajira — oila yangiliklari',
   'notify.settingsTitle': 'Eslatmalar',
   'notify.settingsIntro':
-    'Sarlavhadagi qo‘ng‘iroq tug‘ilgan kunlar, so‘rovlar va yangi hikoyalar uchun.',
+    'Sarlavhadagi qo‘ng‘iroq tug‘ilgan kunlar va yangi hikoyalar uchun.',
   'notify.browserLabel': 'Brauzer tug‘ilgan kun eslatmalari',
   'notify.browserDesc': 'Saytni ochganda tug‘ilgan kun uchun tizim bildirishnomasi.',
 
   'invite.title': 'Qarindoshlarni taklif qilish',
   'invite.intro':
-    'Bu havolani ulashing. Oila parolini kiritgach, “O‘zingizni qo‘shing” ochiladi.',
+    'Bu havolani ulashing. Oila parolini kiritgach, “O‘zingizni qo‘shing” ochiladi va ular darhol shajaraga qo‘shilishi mumkin.',
   'invite.copyBtn': 'Taklif havolasini nusxalash',
   'invite.copied': 'Taklif havolasi nusxalandi.',
   'invite.openedToast': 'Xush kelibsiz — o‘zingizni oila shajarasiga qo‘shing.',
@@ -1193,7 +1202,7 @@ export const uz: Record<TKey, string> = {
   'form.add': "Qo'shish",
   'form.saveAnother': "Saqlab, yana qo'shish",
   'form.saveAnotherTitle': 'Bu odamni saqlab, darhol keyingisini kiritish',
-  'form.addMe': 'So‘rovni yuborish',
+  'form.addMe': 'Meni shajaraga qo‘shish',
   'form.addedToast': '{name} oilaga qo‘shildi.',
   'form.updatedToast': '{name} yangilandi.',
   'form.draftRestored': 'Shu yerda kiritayotgan saqlanmagan o‘zgarishlaringiz tiklandi.',
@@ -1201,6 +1210,7 @@ export const uz: Record<TKey, string> = {
   'form.duplicateMessage': '{name} bir xil ism va tug‘ilgan sanaga ega. Baribir boshqa odam qo‘shilsinmi?',
   'form.duplicateContinue': 'Baribir qo‘shish',
   'form.updatedRestrictedToast': '{name} yangilandi — faqat bo‘sh kataklar to‘ldirildi.',
+  'form.selfJoinAddedToast': '{name} oila shajarasiga qo‘shildi.',
   'form.selfJoinToast':
     'So‘rovingiz yuborildi. Oila egasi ko‘rib chiqib, sizni shajaraga qo‘shadi.',
   'form.selfJoinFailed':
@@ -1209,7 +1219,7 @@ export const uz: Record<TKey, string> = {
 
   'join.title': "O'zingizni shajaraga qo'shing",
   'join.intro':
-    'Ma’lumotlaringizni va qanday bog‘lanishingizni kiriting. So‘rov oila egasiga boradi — u qabul qilgach shajarada ko‘rinasiz.',
+    'Qanday bog‘lanishingizni ayting, keyin ma’lumotlaringizni to‘ldiring. Siz darhol shajarada ko‘rinasiz.',
   'join.howRelated': 'Qarindoshligingiz qanday? Men…',
   'join.kindChild': 'farzandiman',
   'join.kindSpouse': "turmush o'rtog'iman",
@@ -1219,7 +1229,7 @@ export const uz: Record<TKey, string> = {
   'join.searchRelative': 'Qarindoshingizni qidiring…',
   'join.searchLabel': "Qarindoshingiz bo'lgan odamni qidiring",
   'join.noMatches': 'Mos odam topilmadi.',
-  'join.notSure': "Qanday bog'lanishimni bilmayman — egasi joylashtirsin",
+  'join.notSure': "Qanday bog'lanishimni bilmayman — hozircha bog'lanishsiz qo'shing",
   'join.continue': "Ma'lumotlarimni kiritish",
 
   'joinReq.title': 'Qo‘shilish so‘rovlari',

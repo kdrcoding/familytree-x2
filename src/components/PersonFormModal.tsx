@@ -11,7 +11,6 @@ import type { TKey } from '../i18n/translations';
 import { fullName, generatePersonId, marriageDateOf, sortByBirth } from '../utils/family';
 import { countryOptions, normalizeCountry } from '../utils/countries';
 import { uploadPhoto } from '../lib/photoStorage';
-import { submitJoinRequest } from '../lib/joinRequests';
 import { usePhotoUrl } from '../context/PhotoUrlsContext';
 import { downscalePhoto } from '../utils/image';
 import { validatePersonForm, canLink } from '../utils/validation';
@@ -335,8 +334,8 @@ export function PersonFormModal({
   const t = useT();
   const language = useLanguage();
   const isEdit = person !== undefined;
-  // Family editors can edit detail fields (names, dates, place, bio, gender)
-  // like the owner. Relationships, deletion, and deceased status stay owner-only.
+  // Editors edit details freely after login. Relationships / deceased / delete
+  // stay owner-only (see FamilyContext + form fields).
   const restricted = isEdit && !isOwner;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -605,24 +604,15 @@ export function PersonFormModal({
       const effectiveLink =
         link && link.kind === 'child' ? { ...link, secondParentId: otherParentId || null } : link;
       const newPerson = { id, ...trimmed, parentIds: [], spouseIds: [], childIds: [] };
-      if (selfJoin) {
-        try {
-          await submitJoinRequest({
-            person: newPerson,
-            link: effectiveLink ?? null,
-            linkTargetName: linkTarget ? fullName(linkTarget) : undefined,
-          });
-          toast(t('form.selfJoinToast'), 'info');
-        } catch (error) {
-          console.error('Join request failed:', error);
-          toast(t('form.selfJoinFailed'), 'error');
-          return false;
-        }
-      } else {
-        const saved = await addPerson(newPerson, effectiveLink);
-        if (!saved) return false;
-        toast(t('form.addedToast', { name: personLabel }));
-      }
+      // Logged-in family (including “Add yourself”) goes on the tree immediately —
+      // no owner approve/reject step.
+      const saved = await addPerson(newPerson, effectiveLink);
+      if (!saved) return false;
+      toast(
+        selfJoin
+          ? t('form.selfJoinAddedToast', { name: personLabel })
+          : t('form.addedToast', { name: personLabel }),
+      );
       onSaved?.(id);
     }
     return true;
