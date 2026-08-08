@@ -370,7 +370,7 @@ export const en = {
   'form.oneNameHint':
     'Only one name is needed — first name, last name or nickname. Everything else is optional.',
   'form.restrictedNote':
-    "You're editing as a family member: you can update any of these details, including things already filled in. Only relationships (parents and spouses) and deleting a person are reserved for the owner.",
+    "You're editing as a family member: you can update names, dates, place, photo and biography. Marking someone deceased, relationships (parents and spouses), and deleting a person are reserved for the owner.",
   'form.firstName': 'First name',
   'form.lastName': 'Last name',
   'form.gender': 'Gender',
@@ -385,6 +385,14 @@ export const en = {
   'form.day': 'Day',
   'form.dateHint': 'Tip: the year on its own is enough — add the month and day only if you know them.',
   'form.deceasedCheck': 'This person is deceased',
+  'form.deceasedConfirmTitle': 'Mark as deceased?',
+  'form.deceasedConfirmMsg':
+    'This marks the person as deceased on the family tree. You can still add a death date after confirming.',
+  'form.deceasedConfirmBtn': 'Mark deceased',
+  'form.livingConfirmTitle': 'Mark as living?',
+  'form.livingConfirmMsg':
+    'This removes the deceased status and clears any death date for this person.',
+  'form.livingConfirmBtn': 'Mark living',
   'form.city': 'City',
   'form.country': 'Country',
   'form.occupation': 'Occupation',
@@ -1133,7 +1141,7 @@ export const uz: Record<TKey, string> = {
   'form.oneNameHint':
     'Faqat bitta nom kifoya — ism, familiya yoki laqab. Qolgan hammasi ixtiyoriy.',
   'form.restrictedNote':
-    "Siz oila a'zosi sifatida tahrirlayapsiz: bu ma'lumotlarning barchasini, hatto to'ldirilganlarini ham o'zgartira olasiz. Faqat qarindoshlik aloqalari (ota-ona va turmush o'rtoqlar) va odamni o'chirish egasiga tegishli.",
+    "Siz oila a'zosi sifatida tahrirlayapsiz: ism, sanalar, joy, rasm va tarjimai holni o'zgartira olasiz. Vafot etgan deb belgilash, qarindoshlik aloqalari (ota-ona va turmush o'rtoqlar) va odamni o'chirish egasiga tegishli.",
   'form.firstName': 'Ismi',
   'form.lastName': 'Familiyasi',
   'form.gender': 'Jinsi',
@@ -1149,6 +1157,14 @@ export const uz: Record<TKey, string> = {
   'form.day': 'Kun',
   'form.dateHint': "Maslahat: faqat yilning o'zi ham yetarli — oy va kunni bilsangizgina qo'shing.",
   'form.deceasedCheck': 'Bu inson vafot etgan',
+  'form.deceasedConfirmTitle': 'Vafot etgan deb belgilansinmi?',
+  'form.deceasedConfirmMsg':
+    "Bu inson shajarada vafot etgan deb belgilanadi. Tasdiqlaganingizdan keyin vafot sanasini qo'shishingiz mumkin.",
+  'form.deceasedConfirmBtn': 'Vafot etgan deb belgilash',
+  'form.livingConfirmTitle': 'Tirik deb belgilansinmi?',
+  'form.livingConfirmMsg':
+    "Bu vafot etgan holatini olib tashlaydi va vafot sanasini tozalaydi.",
+  'form.livingConfirmBtn': 'Tirik deb belgilash',
   'form.city': 'Shahar',
   'form.country': 'Mamlakat',
   'form.occupation': 'Kasbi',

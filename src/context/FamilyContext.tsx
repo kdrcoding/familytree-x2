@@ -279,13 +279,12 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
           const existing = current.find((p) => p.id === person.id);
           if (!existing) return current;
           if (!isOwner) {
-            // Family editors may change any DETAIL field (names, dates, place,
-            // bio, gender, deceased) — including things the owner filled in —
-            // but never relationships or deletion. Force the existing
-            // relationship arrays back on regardless of what the form sent, and
-            // skip setRelationships entirely.
+            // Family editors may change detail fields (names, dates, place,
+            // bio, gender) but never relationships, deletion, or deceased status.
             const updated = {
               ...person,
+              isDeceased: existing.isDeceased,
+              deathDate: existing.deathDate,
               parentIds: existing.parentIds,
               spouseIds: existing.spouseIds,
               childIds: existing.childIds,

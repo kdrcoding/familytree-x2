@@ -247,6 +247,14 @@ export const ruOverrides: Record<string, string> = {
   'form.month': 'Месяц',
   'form.day': 'День',
   'form.deceasedCheck': 'Этот человек умер',
+  'form.deceasedConfirmTitle': 'Отметить как умершего?',
+  'form.deceasedConfirmMsg':
+    'Этот человек будет отмечен как умерший в семейном дереве. После подтверждения можно добавить дату смерти.',
+  'form.deceasedConfirmBtn': 'Отметить умершим',
+  'form.livingConfirmTitle': 'Отметить как живого?',
+  'form.livingConfirmMsg':
+    'Это снимет статус умершего и очистит дату смерти.',
+  'form.livingConfirmBtn': 'Отметить живым',
   'form.city': 'Город',
   'form.country': 'Страна',
   'form.occupation': 'Профессия',
@@ -554,7 +562,8 @@ export const ruOverrides: Record<string, string> = {
   'person.childrenPlural': 'детей',
 
   // Form
-  'form.restrictedNote': 'Вы редактируете как член семьи: можете обновить любые поля. Только отношения (родители, супруги) и удаление зарезервированы для владельца.',
+  'form.restrictedNote':
+    'Вы редактируете как член семьи: можете обновить имя, даты, место, фото и биографию. Статус «умер», отношения (родители, супруги) и удаление зарезервированы для владельца.',
   'form.dateHint': 'Совет: достаточно только года — месяц и день добавляйте, только если знаете.',
   'form.photoNote': 'Необязательно. Фото автоматически сжимается — подойдут даже снимки с телефона.',
   'form.photoTooBig': 'Фото слишком большое — выберите изображение до 15 MB.',
