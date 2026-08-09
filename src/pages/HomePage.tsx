@@ -21,15 +21,14 @@ import { computeStats } from '../utils/stats';
 import { findFounders, fullName } from '../utils/family';
 import { formatDate, monthAbbr } from '../utils/dates';
 import { countryLabel } from '../utils/countries';
-import { getUpcomingBirthdays } from '../utils/birthdays';
-import { getUpcomingAnniversaries } from '../utils/anniversaries';
+import { getUpcomingCelebrations, windowCelebrations } from '../utils/celebrations';
 import { downloadFamilyCalendarIcs } from '../utils/ics';
 import { loadJson, saveJson, STORAGE_KEYS } from '../utils/storage';
 import { usePrivacy } from '../hooks/usePrivacy';
 import { Avatar } from '../components/Avatar';
 
-/** How far ahead the homepage looks for upcoming birthdays. */
-const BIRTHDAY_WINDOW_DAYS = 30;
+/** How far ahead the homepage looks for upcoming birthdays & anniversaries. */
+const CELEBRATION_WINDOW_DAYS = 30;
 
 export function HomePage() {
   const { people } = useFamily();
@@ -46,24 +45,17 @@ export function HomePage() {
   const founders = useMemo(() => findFounders(people).slice(0, 2), [people]);
 
   const showBirthDates = privacy.showBirthDate();
-  const upcoming = useMemo(
-    () => (showBirthDates ? getUpcomingBirthdays(people) : []),
+  const upcomingCelebrations = useMemo(
+    () => getUpcomingCelebrations(people, { includeBirthdays: showBirthDates }),
     [people, showBirthDates],
   );
-  // Only list birthdays inside the window — empty state when none are near.
-  const birthdays = useMemo(
-    () => upcoming.filter((b) => b.daysUntil <= BIRTHDAY_WINDOW_DAYS),
-    [upcoming],
+  const celebrations = useMemo(
+    () => windowCelebrations(upcomingCelebrations, CELEBRATION_WINDOW_DAYS),
+    [upcomingCelebrations],
   );
 
-  const upcomingAnniversaries = useMemo(() => getUpcomingAnniversaries(people), [people]);
-  const anniversaries = useMemo(() => {
-    const soon = upcomingAnniversaries.filter((a) => a.daysUntil <= BIRTHDAY_WINDOW_DAYS);
-    return soon.length > 0 ? soon : upcomingAnniversaries.slice(0, 2);
-  }, [upcomingAnniversaries]);
-
   useEffect(() => {
-    const todays = upcoming.filter((b) => b.isToday);
+    const todays = upcomingCelebrations.filter((c) => c.isToday);
     if (todays.length === 0) return;
     const now = new Date();
     const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -73,13 +65,29 @@ export function HomePage() {
     );
     if (last === todayKey) return;
     saveJson(STORAGE_KEYS.birthdayNotified, todayKey);
-    toast(
-      todays.length === 1
-        ? t('home.bdayToastOne', { name: fullName(todays[0].person) })
-        : t('home.bdayToastMany', { names: todays.map((b) => fullName(b.person)).join(', ') }),
-      'info',
-    );
-  }, [upcoming, toast, t]);
+
+    const bdays = todays.filter((c) => c.kind === 'birthday');
+    const annivs = todays.filter((c) => c.kind === 'anniversary');
+    const parts: string[] = [];
+    if (bdays.length === 1 && bdays[0].kind === 'birthday') {
+      parts.push(t('home.bdayToastOne', { name: fullName(bdays[0].birthday.person) }));
+    } else if (bdays.length > 1) {
+      parts.push(
+        t('home.bdayToastMany', {
+          names: bdays
+            .map((c) => (c.kind === 'birthday' ? fullName(c.birthday.person) : ''))
+            .join(', '),
+        }),
+      );
+    }
+    if (annivs.length === 1 && annivs[0].kind === 'anniversary') {
+      const a = annivs[0].anniversary;
+      parts.push(t('home.annivToastOne', { names: `${fullName(a.a)} & ${fullName(a.b)}` }));
+    } else if (annivs.length > 1) {
+      parts.push(t('home.annivToastMany', { n: annivs.length }));
+    }
+    if (parts.length > 0) toast(parts.join(' · '), 'info');
+  }, [upcomingCelebrations, toast, t]);
 
   useEffect(() => {
     if (searchParams.get('invite') === '1' || searchParams.get('join') === '1') {
@@ -180,16 +188,16 @@ export function HomePage() {
       </section>
 
       <div className="relative z-10 mx-auto -mt-6 w-full max-w-3xl space-y-7 px-5 sm:space-y-8 sm:px-8">
-        {/* Birthdays */}
-        {showBirthDates && (
-          <section className="home-section" aria-labelledby="home-birthdays">
+        {/* Upcoming birthdays + wedding anniversaries */}
+        {(celebrations.length > 0 || showBirthDates) && (
+          <section className="home-section" aria-labelledby="home-celebrations">
             <div className="home-section-card overflow-hidden">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200/80 px-5 py-4 dark:border-stone-700/80">
                 <h2
-                  id="home-birthdays"
+                  id="home-celebrations"
                   className="font-display text-lg font-semibold tracking-tight text-stone-900 dark:text-stone-50 sm:text-xl"
                 >
-                  {t('home.birthdaysTitle')}
+                  {t('home.celebrationsTitle')}
                 </h2>
                 {!easy && (
                   <button
@@ -203,10 +211,10 @@ export function HomePage() {
                 )}
               </div>
 
-              {birthdays.length === 0 ? (
+              {celebrations.length === 0 ? (
                 <div className="px-5 py-8 text-center">
                   <p className="text-sm text-stone-500 dark:text-stone-400">
-                    {t('home.bdayEmpty', { days: BIRTHDAY_WINDOW_DAYS })}
+                    {t('home.bdayEmpty', { days: CELEBRATION_WINDOW_DAYS })}
                   </p>
                   {!easy && (
                     <button
@@ -221,37 +229,94 @@ export function HomePage() {
                 </div>
               ) : (
                 <ul className="space-y-2 p-3 sm:p-4">
-                  {birthdays.map((b) => {
-                    const showAge = b.turningAge !== null && privacy.showAge(b.person);
+                  {celebrations.map((c) => {
+                    if (c.kind === 'birthday') {
+                      const b = c.birthday;
+                      const showAge = b.turningAge !== null && privacy.showAge(b.person);
+                      return (
+                        <li key={c.key}>
+                          <Link
+                            to={`/tree?person=${encodeURIComponent(b.person.id)}`}
+                            className={`home-bday-row ${b.isToday ? 'home-bday-today' : ''}`}
+                          >
+                            <span className="home-bday-date" aria-hidden>
+                              <span className="home-bday-date__month">
+                                {monthAbbr(b.month, language)}
+                              </span>
+                              <span className="home-bday-date__day">{b.day}</span>
+                            </span>
+                            <Avatar person={b.person} size={b.isToday ? 'md' : 'sm'} />
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate font-semibold text-stone-900 dark:text-stone-100">
+                                {fullName(b.person)}
+                              </p>
+                              <p className="text-sm text-stone-500 dark:text-stone-400">
+                                {t('home.celebrationBirthday')}
+                                {showAge ? (
+                                  <>
+                                    {' · '}
+                                    {b.isToday
+                                      ? t('home.bdayTurnsToday', { age: b.turningAge! })
+                                      : t('home.bdayTurns', { age: b.turningAge! })}
+                                  </>
+                                ) : null}
+                              </p>
+                            </div>
+                            <span
+                              className={`home-bday-when ${b.isToday ? 'home-bday-when--today' : ''}`}
+                            >
+                              {whenLabel(b.isToday, b.daysUntil)}
+                            </span>
+                          </Link>
+                        </li>
+                      );
+                    }
+
+                    const a = c.anniversary;
+                    const yearsLabel =
+                      a.years === null
+                        ? null
+                        : a.years === 1
+                          ? a.isToday
+                            ? t('home.annivYearOneToday')
+                            : t('home.annivYearOne')
+                          : a.isToday
+                            ? t('home.annivYearsToday', { n: a.years })
+                            : t('home.annivYears', { n: a.years });
                     return (
-                      <li key={b.person.id}>
+                      <li key={c.key}>
                         <Link
-                          to={`/tree?person=${encodeURIComponent(b.person.id)}`}
-                          className={`home-bday-row ${b.isToday ? 'home-bday-today' : ''}`}
+                          to={`/tree?person=${encodeURIComponent(a.a.id)}`}
+                          className={`home-bday-row ${a.isToday ? 'home-bday-anniv-today' : ''}`}
                         >
                           <span className="home-bday-date" aria-hidden>
                             <span className="home-bday-date__month">
-                              {monthAbbr(b.month, language)}
+                              {monthAbbr(a.month, language)}
                             </span>
-                            <span className="home-bday-date__day">{b.day}</span>
+                            <span className="home-bday-date__day">{a.day}</span>
                           </span>
-                          <Avatar person={b.person} size={b.isToday ? 'md' : 'sm'} />
+                          <div className="flex -space-x-2">
+                            <Avatar person={a.a} size={a.isToday ? 'md' : 'sm'} />
+                            <Avatar person={a.b} size={a.isToday ? 'md' : 'sm'} />
+                          </div>
                           <div className="min-w-0 flex-1">
                             <p className="truncate font-semibold text-stone-900 dark:text-stone-100">
-                              {fullName(b.person)}
+                              {fullName(a.a)} & {fullName(a.b)}
                             </p>
-                            {showAge ? (
-                              <p className="text-sm text-stone-500 dark:text-stone-400">
-                                {b.isToday
-                                  ? t('home.bdayTurnsToday', { age: b.turningAge! })
-                                  : t('home.bdayTurns', { age: b.turningAge! })}
-                              </p>
-                            ) : null}
+                            <p className="text-sm text-stone-500 dark:text-stone-400">
+                              {t('home.celebrationAnniversary')}
+                              {yearsLabel && (
+                                <>
+                                  {' · '}
+                                  {yearsLabel}
+                                </>
+                              )}
+                            </p>
                           </div>
                           <span
-                            className={`home-bday-when ${b.isToday ? 'home-bday-when--today' : ''}`}
+                            className={`home-bday-when ${a.isToday ? 'home-bday-when--anniv-today' : ''}`}
                           >
-                            {whenLabel(b.isToday, b.daysUntil)}
+                            {whenLabel(a.isToday, a.daysUntil)}
                           </span>
                         </Link>
                       </li>
@@ -287,58 +352,6 @@ export function HomePage() {
                 </div>
               );
             })}
-          </section>
-        )}
-
-        {!easy && anniversaries.length > 0 && (
-          <section className="home-section hidden sm:block" aria-labelledby="home-anniv">
-            <div className="home-section-card overflow-hidden">
-              <h2
-                id="home-anniv"
-                className="border-b border-stone-200/80 px-5 py-4 font-display text-lg font-semibold tracking-tight text-stone-900 dark:border-stone-700/80 dark:text-stone-50 sm:text-xl"
-              >
-                {t('home.annivTitle')}
-              </h2>
-              <ul className="divide-y divide-stone-100 px-2 py-2 sm:px-3 dark:divide-stone-800">
-                {anniversaries.map((a) => (
-                  <li key={`${a.a.id}-${a.b.id}`} className="home-list-item !cursor-default">
-                    <div className="flex -space-x-2">
-                      <Avatar person={a.a} size="md" />
-                      <Avatar person={a.b} size="md" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-semibold text-stone-900 dark:text-stone-100">
-                        {fullName(a.a)} & {fullName(a.b)}
-                      </p>
-                      <p className="text-sm text-stone-500 dark:text-stone-400">
-                        {monthAbbr(a.month, language)} {a.day}
-                        {a.years !== null && (
-                          <>
-                            {' · '}
-                            {a.years === 1
-                              ? a.isToday
-                                ? t('home.annivYearOneToday')
-                                : t('home.annivYearOne')
-                              : a.isToday
-                                ? t('home.annivYearsToday', { n: a.years })
-                                : t('home.annivYears', { n: a.years })}
-                          </>
-                        )}
-                      </p>
-                    </div>
-                    <span
-                      className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums ${
-                        a.isToday
-                          ? 'bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-300'
-                          : 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400'
-                      }`}
-                    >
-                      {whenLabel(a.isToday, a.daysUntil)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
           </section>
         )}
 

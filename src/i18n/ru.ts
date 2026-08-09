@@ -58,7 +58,12 @@ export const ruOverrides: Record<string, string> = {
   'home.foundersTitle': 'С чего всё началось',
   'home.born': 'Род. {date}',
   'home.birthdaysTitle': 'Дни рождения',
+  'home.celebrationsTitle': 'Дни рождения и годовщины',
+  'home.celebrationBirthday': 'День рождения',
+  'home.celebrationAnniversary': 'Годовщина свадьбы',
   'home.annivTitle': 'Годовщины свадьбы',
+  'home.annivToastOne': 'С годовщиной — {names}!',
+  'home.annivToastMany': 'Сегодня {n} годовщин свадьбы!',
   'home.bdayToday': 'Сегодня',
   'home.bdayTomorrow': 'Завтра',
   'home.bdayInDays': 'через {n} дн.',
@@ -207,7 +212,7 @@ export const ruOverrides: Record<string, string> = {
 
   'home.bdaysNone': 'В ближайшие {days} дн. дней рождения нет.',
   'home.bdayEmpty':
-    'В ближайшие {days} дн. дней рождения нет. Добавьте даты рождения в карточках — тогда они появятся здесь.',
+    'В ближайшие {days} дн. дней рождения или годовщин нет. Добавьте даты рождения или свадьбы в карточках — тогда они появятся здесь.',
   'home.bdayTurns': 'исполняется {age}',
   'home.bdayTurnsToday': 'сегодня исполняется {age}',
   'home.bdayToastOne': 'Сегодня день рождения у {name}.',
