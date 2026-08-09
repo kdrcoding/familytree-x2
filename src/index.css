@@ -348,6 +348,13 @@ html:not(.dark) .border-stone-300 {
   fill: var(--color-rose-300);
   opacity: 0.85;
 }
+.spouse-edge__hit:focus {
+  outline: none;
+}
+.spouse-edge__hit:focus-visible {
+  stroke: var(--color-emerald-500);
+  stroke-width: 2;
+}
 /* Parent -> child lines: colour comes from per-couple DNA data (inline). */
 .edge-child .react-flow__edge-path {
   stroke-width: 2;

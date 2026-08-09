@@ -38,6 +38,7 @@ import { SpouseEdge } from '../features/tree/SpouseEdge';
 import { PersonNode } from '../features/tree/PersonNode';
 import { TreeInteractionContext } from '../features/tree/TreeInteractionContext';
 import type { TreeInteraction } from '../features/tree/TreeInteractionContext';
+import { CoupleAnniversaryModal } from '../components/CoupleAnniversaryModal';
 
 const nodeTypes: NodeTypes = { person: PersonNode, junction: JunctionNode, genLabel: GenLabelNode };
 const edgeTypes: EdgeTypes = { child: ChildEdge, spouse: SpouseEdge };
@@ -418,6 +419,7 @@ export function TreePage() {
   const [form, setForm] = useState<{ person?: FamilyPerson; link?: RelationLink } | null>(null);
   const [focusId, setFocusId] = useState<string | null>(null);
   const [exportBusy, setExportBusy] = useState(false);
+  const [coupleIds, setCoupleIds] = useState<[string, string] | null>(null);
   const clearFocus = useCallback(() => setFocusId(null), []);
 
   useEffect(() => {
@@ -492,6 +494,7 @@ export function TreePage() {
       onOpen: (id) => setDetailsId(id),
       onToggleCollapse: toggleCollapse,
       onQuickAdd: (kind, personId) => setForm({ link: { kind, targetId: personId } }),
+      onOpenCouple: (aId, bId) => setCoupleIds([aId, bId]),
       editMode: treeToolsOn,
     }),
     [toggleCollapse, treeToolsOn],
@@ -715,6 +718,23 @@ export function TreePage() {
           }}
         />
       )}
+      {coupleIds &&
+        (() => {
+          const a = index.get(coupleIds[0]);
+          const b = index.get(coupleIds[1]);
+          if (!a || !b) return null;
+          return (
+            <CoupleAnniversaryModal
+              a={a}
+              b={b}
+              onClose={() => setCoupleIds(null)}
+              onOpenPerson={(id) => {
+                setCoupleIds(null);
+                setDetailsId(id);
+              }}
+            />
+          );
+        })()}
       {form && (
         <PersonFormModal
           {...form}
