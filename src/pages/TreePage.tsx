@@ -34,12 +34,13 @@ import { shareTreePoster } from '../features/tree/exportPng';
 import { JunctionNode } from '../features/tree/JunctionNode';
 import { GenLabelNode } from '../features/tree/GenLabelNode';
 import { ChildEdge } from '../features/tree/ChildEdge';
+import { SpouseEdge } from '../features/tree/SpouseEdge';
 import { PersonNode } from '../features/tree/PersonNode';
 import { TreeInteractionContext } from '../features/tree/TreeInteractionContext';
 import type { TreeInteraction } from '../features/tree/TreeInteractionContext';
 
 const nodeTypes: NodeTypes = { person: PersonNode, junction: JunctionNode, genLabel: GenLabelNode };
-const edgeTypes: EdgeTypes = { child: ChildEdge };
+const edgeTypes: EdgeTypes = { child: ChildEdge, spouse: SpouseEdge };
 
 const START_ZOOM = 1.05;
 const START_ZOOM_EASY = 1.2;
@@ -303,10 +304,13 @@ function TreeCanvas({
               </div>
               <ul className="space-y-1.5 text-stone-600 dark:text-stone-300">
                 <li className="flex items-center gap-2">
-                  <span
-                    aria-hidden
-                    className="inline-block h-0.5 w-5 rounded bg-rose-400 dark:bg-rose-500"
-                  />
+                  <span aria-hidden className="relative inline-flex h-3 w-7 items-center justify-center">
+                    <span className="absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 rounded bg-rose-400 dark:bg-rose-500" />
+                    <span className="relative z-[1] flex -space-x-1">
+                      <span className="inline-block h-2.5 w-2.5 rounded-full border-[1.5px] border-rose-500 bg-transparent dark:border-rose-400" />
+                      <span className="inline-block h-2.5 w-2.5 rounded-full border-[1.5px] border-rose-500 bg-transparent dark:border-rose-400" />
+                    </span>
+                  </span>
                   <span>{t('tree.legendMarried')}</span>
                 </li>
                 <li className="flex items-center gap-2">

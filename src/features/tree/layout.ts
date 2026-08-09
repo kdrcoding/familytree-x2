@@ -20,11 +20,13 @@ const SPACING: Record<
 > = {
   // Tighter spouse/root gaps keep the oldest generation together; a taller
   // level gap leaves room for separate green bus lanes between rows.
-  comfortable: { spouse: 28, sibling: 36, level: 156, root: 44 },
-  compact: { spouse: 20, sibling: 22, level: 124, root: 28 },
+  comfortable: { spouse: 36, sibling: 36, level: 156, root: 44 },
+  compact: { spouse: 32, sibling: 22, level: 124, root: 28 },
 };
 
 const JUNCTION = 10;
+/** Drop the child-junction just below the wedding rings on the marriage line. */
+const JUNCTION_BELOW_RINGS = 14;
 // Child connectors run along a "bus" just before the children. Each couple
 // gets its own lane so a long cross-family link crosses other buses instead
 // of running on top of them (see ChildEdge).
@@ -330,8 +332,9 @@ export function computeTreeLayout(
           sourceHandle: 'right',
           target: right,
           targetHandle: 'left',
-          type: 'straight',
+          type: 'spouse',
           className: divorced ? 'edge-divorced' : 'edge-spouse',
+          data: { divorced },
           focusable: false,
         });
       }
@@ -343,7 +346,10 @@ export function computeTreeLayout(
         junctionNodes.push({
           id: junctionId,
           type: 'junction',
-          position: { x: gapCenter - JUNCTION / 2, y: y + CARD_H / 2 - JUNCTION / 2 },
+          position: {
+            x: gapCenter - JUNCTION / 2,
+            y: y + CARD_H / 2 - JUNCTION / 2 + JUNCTION_BELOW_RINGS,
+          },
           width: JUNCTION,
           height: JUNCTION,
           data: { orientation },
@@ -430,7 +436,7 @@ export function computeTreeLayout(
     const left = placed[0];
     const right = placed[placed.length - 1];
     const midX = (left.pos.x + CARD_W + right.pos.x) / 2;
-    const midY = (left.pos.y + right.pos.y) / 2 + CARD_H / 2;
+    const midY = (left.pos.y + right.pos.y) / 2 + CARD_H / 2 + JUNCTION_BELOW_RINGS;
     const junctionId = `junction-${pairKey}`;
     junctionByPair.set(pairKey, junctionId);
     junctionNodes.push({
