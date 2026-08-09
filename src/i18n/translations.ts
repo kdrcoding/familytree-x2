@@ -607,7 +607,7 @@ export const en = {
     'Open anyone, then tap Edit. Change names, dates, photo, and more — save when you are done.',
   'about.howStep3Title': 'Add a spouse or child',
   'about.howStep3Text':
-    'Open a person and use Add spouse or Add child. Or turn on Edit on the tree to use the + buttons on cards.',
+    'Open a person and use Add spouse or Add child on their card. On a computer you can also turn on Edit for + buttons on the tree.',
   'about.howStep4Title': 'Add yourself',
   'about.howStep4Text':
     'New to the tree? Tap Add yourself, say how you connect, and fill in your details — you appear right away.',
@@ -1418,7 +1418,7 @@ export const uz: Record<TKey, string> = {
     'Istalgan odamni oching, Tahrirlashni bosing. Ism, sana, rasm va boshqalarni o‘zgartiring — saqlang.',
   'about.howStep3Title': 'Turmush o‘rtoq yoki farzand qo‘shing',
   'about.howStep3Text':
-    'Odamni ochib «Turmush o‘rtoq» yoki «Farzand»ni bosing. Yoki shajarada Tahrirlashni yoqib kartochkadagi + dan foydalaning.',
+    'Odamni ochib «Turmush o‘rtoq» yoki «Farzand»ni bosing. Kompyuterda Tahrirlashni yoqib kartochkadagi + dan ham foydalanish mumkin.',
   'about.howStep4Title': 'O‘zingizni qo‘shing',
   'about.howStep4Text':
     'Shajarada yo‘qmisiz? «O‘zingizni qo‘shing»ni bosing, qanday bog‘lanishingizni ayting va ma’lumotlarni to‘ldiring — darhol ko‘rinasiz.',

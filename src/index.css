@@ -112,7 +112,7 @@
 
   :root {
     /* Bottom tab bar ≈ 44px content + safe-area (notched iPhones). */
-    --bottom-nav-h: calc(3.25rem + env(safe-area-inset-bottom, 0px));
+    --bottom-nav-h: calc(3.75rem + env(safe-area-inset-bottom, 0px));
     --safe-top: env(safe-area-inset-top, 0px);
   }
 

@@ -58,12 +58,6 @@ export function Layout() {
     { to: '/about', label: t('nav.about'), easy: true },
   ].filter((item) => !easy || item.easy);
 
-  const mobileNav = [
-    ...primaryNav,
-    { to: '/settings', label: t('nav.settings') },
-    ...moreNav,
-  ];
-
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `rounded-lg px-2.5 py-1.5 text-sm font-medium transition-colors ${
       isActive
@@ -93,10 +87,10 @@ export function Layout() {
             className="flex min-w-0 items-center gap-2"
             onClick={() => setMenuOpen(false)}
           >
-            <span className="sm:hidden">
+            <span className="lg:hidden">
               <BrandLogo size="sm" wordmark={false} />
             </span>
-            <span className="hidden sm:inline-flex">
+            <span className="hidden lg:inline-flex">
               <BrandLogo size="sm" />
             </span>
           </NavLink>
@@ -147,6 +141,7 @@ export function Layout() {
           </nav>
 
           <div className="ml-auto flex items-center gap-0.5 lg:ml-2">
+            {/* Language stays in the header — family often switches languages mid-visit. */}
             <button
               type="button"
               className="icon-btn !min-h-10 !min-w-10 !gap-0.5 text-xs font-bold"
@@ -157,9 +152,11 @@ export function Layout() {
               <Languages className="h-4 w-4" aria-hidden />
               <span className="tabular-nums">{languageCodeLabel(settings.language)}</span>
             </button>
+
+            {/* Desktop chrome — phone uses bottom tabs + Settings for these. */}
             <button
               type="button"
-              className="icon-btn !min-h-10 !min-w-10"
+              className="icon-btn !hidden !min-h-10 !min-w-10 lg:!inline-flex"
               onClick={toggleTheme}
               title={settings.theme === 'dark' ? t('nav.themeLight') : t('nav.themeDark')}
               aria-label={settings.theme === 'dark' ? t('nav.themeLight') : t('nav.themeDark')}
@@ -173,7 +170,7 @@ export function Layout() {
             {signedIn && (
               <button
                 type="button"
-                className="icon-btn !min-h-10 !min-w-10"
+                className="icon-btn !hidden !min-h-10 !min-w-10 lg:!inline-flex"
                 onClick={() => void handleSignOut()}
                 title={t('nav.signOut')}
                 aria-label={t('nav.signOut')}
@@ -183,22 +180,26 @@ export function Layout() {
             )}
             <NavLink
               to="/settings"
-              className={iconBtnClass}
+              className={({ isActive }) => `${iconBtnClass({ isActive })} !hidden lg:!inline-flex`}
               title={t('nav.settings')}
               aria-label={t('nav.settings')}
               onClick={() => setMenuOpen(false)}
             >
               <Settings className="h-5 w-5" aria-hidden />
             </NavLink>
-            <button
-              type="button"
-              className="icon-btn !min-h-10 !min-w-10 lg:hidden"
-              onClick={() => setMenuOpen((open) => !open)}
-              aria-expanded={menuOpen}
-              aria-label={menuOpen ? t('nav.menuClose') : t('nav.menuOpen')}
-            >
-              {menuOpen ? <X className="h-5 w-5" aria-hidden /> : <Menu className="h-5 w-5" aria-hidden />}
-            </button>
+
+            {/* Phone: only secondary pages (Related, Timeline, About…) — not the 4 tabs. */}
+            {moreNav.length > 0 && (
+              <button
+                type="button"
+                className="icon-btn !min-h-10 !min-w-10 lg:hidden"
+                onClick={() => setMenuOpen((open) => !open)}
+                aria-expanded={menuOpen}
+                aria-label={menuOpen ? t('nav.menuClose') : t('nav.menuOpen')}
+              >
+                {menuOpen ? <X className="h-5 w-5" aria-hidden /> : <Menu className="h-5 w-5" aria-hidden />}
+              </button>
+            )}
           </div>
         </div>
 
@@ -208,11 +209,10 @@ export function Layout() {
             aria-label={t('nav.mobileNav')}
           >
             <ul className="flex flex-col gap-0.5">
-              {mobileNav.map((item) => (
+              {moreNav.map((item) => (
                 <li key={item.to}>
                   <NavLink
                     to={item.to}
-                    end={item.to === '/'}
                     className={({ isActive }) =>
                       `block w-full rounded-xl px-3.5 py-2.5 text-base font-semibold transition-colors ${
                         isActive
@@ -226,18 +226,6 @@ export function Layout() {
                   </NavLink>
                 </li>
               ))}
-              {signedIn && (
-                <li>
-                  <button
-                    type="button"
-                    className="flex w-full items-center gap-2 rounded-xl px-3.5 py-2.5 text-left text-base font-semibold text-rose-700 hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-950/40"
-                    onClick={() => void handleSignOut()}
-                  >
-                    <LogOut className="h-5 w-5" aria-hidden />
-                    {t('nav.signOut')}
-                  </button>
-                </li>
-              )}
             </ul>
           </nav>
         )}
@@ -254,7 +242,7 @@ export function Layout() {
           <Outlet />
         </Suspense>
         {!isTreePage && (
-          <footer className="mt-auto border-t border-stone-200 px-4 py-4 dark:border-stone-800">
+          <footer className="mt-auto hidden border-t border-stone-200 px-4 py-4 sm:block dark:border-stone-800">
             <div className="mx-auto flex max-w-7xl flex-col items-center gap-2 sm:flex-row sm:justify-between">
               <p className="text-center text-xs text-stone-500 dark:text-stone-400 sm:text-left">
                 {t('footer.note')}

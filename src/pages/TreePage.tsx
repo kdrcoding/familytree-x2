@@ -19,7 +19,7 @@ import { useSettings } from '../context/SettingsContext';
 import { useToast } from '../context/ToastContext';
 import { usePersistentState } from '../hooks/usePersistentState';
 import { useT } from '../i18n/useT';
-import { loadJson, saveJson, STORAGE_KEYS } from '../utils/storage';
+import { STORAGE_KEYS } from '../utils/storage';
 import { getAncestorIds, fullName } from '../utils/family';
 import { matchesSearch } from '../utils/filters';
 import { MadeByKadir } from '../components/MadeByKadir';
@@ -345,7 +345,7 @@ function TreeCanvas({
           )}
         </Panel>
       )}
-      <Panel position="top-right" className="!m-1.5 flex gap-1 sm:!m-3 sm:flex-col">
+      <Panel position="top-right" className="!m-1.5 hidden gap-1 sm:!m-3 sm:flex sm:flex-col">
         <button
           type="button"
           className="tree-action-btn inline-flex items-center gap-1.5 !px-2.5 !py-2"
@@ -415,24 +415,11 @@ export function TreePage() {
   const [focusId, setFocusId] = useState<string | null>(null);
   const [exportBusy, setExportBusy] = useState(false);
   const clearFocus = useCallback(() => setFocusId(null), []);
-  const [showEditHint, setShowEditHint] = useState(
-    () => loadJson<boolean>(STORAGE_KEYS.treeTipSeen, (v): v is boolean => typeof v === 'boolean') !== true,
-  );
-
-  const dismissEditHint = useCallback(() => {
-    saveJson(STORAGE_KEYS.treeTipSeen, true);
-    setShowEditHint(false);
-  }, []);
 
   useEffect(() => {
     // Keep browse mode calm after login; turn edit tools off if they lose access.
     if (!canEdit) setEditMode(false);
   }, [canEdit]);
-
-  // Once they turn edit mode on, the tip has done its job.
-  useEffect(() => {
-    if (editMode && showEditHint) dismissEditHint();
-  }, [editMode, showEditHint, dismissEditHint]);
 
   // Drop stale details if the person was deleted / removed by live sync.
   useEffect(() => {
@@ -449,6 +436,10 @@ export function TreePage() {
       setSearchParams(next, { replace: true });
     }
   }, [searchParams, setSearchParams]);
+
+  // Phones: keep cards clean — edit/add spouse/child happens in the person sheet.
+  // Desktop keeps optional Edit mode for on-card + buttons.
+  const treeToolsOn = isPhone ? false : editMode;
 
   const layout = useMemo(
     () =>
@@ -497,9 +488,9 @@ export function TreePage() {
       onOpen: (id) => setDetailsId(id),
       onToggleCollapse: toggleCollapse,
       onQuickAdd: (kind, personId) => setForm({ link: { kind, targetId: personId } }),
-      editMode,
+      editMode: treeToolsOn,
     }),
-    [toggleCollapse, editMode],
+    [toggleCollapse, treeToolsOn],
   );
 
   // Expand every collapsed branch between the founders and this person, then
@@ -616,10 +607,11 @@ export function TreePage() {
             <TreeSearch onSelect={focusPerson} large />
           </div>
 
-          <div className="flex shrink-0 items-center gap-1">
+          {/* Desktop-only extras — phone uses bottom tabs + person modal. */}
+          <div className="hidden shrink-0 items-center gap-1 sm:flex">
             <Link
               to="/members"
-              className="btn-secondary !hidden !min-h-10 !px-2.5 sm:!inline-flex sm:!px-3"
+              className="btn-secondary !min-h-10 !px-2.5 sm:!px-3"
               aria-label={t('tree.listView')}
             >
               <Users className="h-4 w-4" aria-hidden />
@@ -628,7 +620,7 @@ export function TreePage() {
             {canEdit && (
               <button
                 type="button"
-                className="btn-primary !hidden !min-h-10 sm:!inline-flex"
+                className="btn-primary !min-h-10"
                 onClick={() => setForm({})}
               >
                 <UserPlus className="h-4 w-4" aria-hidden />
@@ -656,7 +648,7 @@ export function TreePage() {
             </button>
             <button
               type="button"
-              className={`${editMode ? 'btn-primary' : 'btn-secondary'} !min-h-10 !min-w-10 !px-2.5 sm:!px-3`}
+              className={`${editMode ? 'btn-primary' : 'btn-secondary'} !min-h-10 !px-2.5 sm:!px-3`}
               onClick={() => {
                 if (!canEdit) setUnlockOpen(true);
                 else setEditMode((on) => !on);
@@ -682,32 +674,6 @@ export function TreePage() {
         </div>
       </div>
 
-      {canEdit && !editMode && showEditHint && (
-        <div className="border-b border-brand-200/80 bg-brand-50 px-3 py-2 dark:border-brand-900/40 dark:bg-brand-950/50">
-          <div className="mx-auto flex max-w-[1600px] items-start gap-2 sm:items-center">
-            <Pencil className="mt-0.5 h-4 w-4 shrink-0 text-brand-700 dark:text-brand-300 sm:mt-0" aria-hidden />
-            <p className="min-w-0 flex-1 text-sm text-brand-950 dark:text-brand-100">
-              {t('tree.editHint')}
-            </p>
-            <button
-              type="button"
-              className="btn-primary !min-h-9 shrink-0 !px-3 !text-sm"
-              onClick={() => setEditMode(true)}
-            >
-              {t('tree.editMode')}
-            </button>
-            <button
-              type="button"
-              className="icon-btn !min-h-9 !min-w-9 shrink-0"
-              onClick={dismissEditHint}
-              aria-label={t('common.close')}
-            >
-              <X className="h-4 w-4" aria-hidden />
-            </button>
-          </div>
-        </div>
-      )}
-
       <div className="relative min-h-0 flex-1 overflow-hidden">
         <div className="absolute inset-0 bg-[var(--shajira-page,#e7e5e4)] dark:bg-stone-950">
           <TreeInteractionContext.Provider value={interaction}>
@@ -722,17 +688,6 @@ export function TreePage() {
             </ReactFlowProvider>
           </TreeInteractionContext.Provider>
         </div>
-
-        {canEdit && (
-          <button
-            type="button"
-            className="tree-add-fab btn-primary !min-h-12 !min-w-12 rounded-full shadow-lg shadow-brand-900/25 sm:hidden"
-            onClick={() => setForm({})}
-            aria-label={t('tree.addPerson')}
-          >
-            <UserPlus className="h-5 w-5" aria-hidden />
-          </button>
-        )}
       </div>
 
       {detailsId && (

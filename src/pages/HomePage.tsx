@@ -108,7 +108,7 @@ export function HomePage() {
   };
 
   return (
-    <div className="home-page pb-14">
+    <div className="home-page">
       <section className="home-hero overflow-hidden text-brand-950 dark:text-stone-50" aria-labelledby="home-brand">
         <div className="home-hero__atmosphere" aria-hidden>
           <svg className="home-hero__pedigree" viewBox="0 0 420 420" fill="none">
@@ -162,7 +162,7 @@ export function HomePage() {
           <div className="home-hero__actions mt-4 flex flex-col gap-2.5 sm:mt-6 sm:flex-row sm:items-center">
             <Link
               to="/tree"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-800 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-brand-950/25 transition-all hover:-translate-y-0.5 hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-100 active:translate-y-0 dark:bg-white dark:text-brand-950 dark:shadow-brand-950/20 dark:hover:bg-brand-50 dark:focus-visible:ring-white dark:focus-visible:ring-offset-brand-950"
+              className="hidden min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-800 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-brand-950/25 transition-all hover:-translate-y-0.5 hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-100 active:translate-y-0 sm:inline-flex dark:bg-white dark:text-brand-950 dark:shadow-brand-950/20 dark:hover:bg-brand-50 dark:focus-visible:ring-white dark:focus-visible:ring-offset-brand-950"
             >
               {t('home.explore')}
               <ArrowRight className="h-4 w-4" aria-hidden />
@@ -266,7 +266,7 @@ export function HomePage() {
         {!easy && (
           <section
             aria-label={t('home.summaryLabel')}
-            className="home-section grid grid-cols-2 gap-2.5 sm:grid-cols-4 sm:gap-3"
+            className="home-section hidden grid-cols-2 gap-2.5 sm:grid sm:grid-cols-4 sm:gap-3"
           >
             {[
               { icon: Users, label: t('home.statMembers'), value: stats.total },
@@ -291,7 +291,7 @@ export function HomePage() {
         )}
 
         {!easy && anniversaries.length > 0 && (
-          <section className="home-section" aria-labelledby="home-anniv">
+          <section className="home-section hidden sm:block" aria-labelledby="home-anniv">
             <div className="home-section-card overflow-hidden">
               <h2
                 id="home-anniv"
@@ -343,7 +343,7 @@ export function HomePage() {
         )}
 
         {!easy && founders.length > 0 && (
-          <section className="home-section" aria-labelledby="home-founders">
+          <section className="home-section hidden sm:block" aria-labelledby="home-founders">
             <div className="home-section-card overflow-hidden">
               <h2
                 id="home-founders"
@@ -390,7 +390,7 @@ export function HomePage() {
         )}
 
         {!easy && (
-          <p className="home-section rounded-xl border border-stone-200/60 bg-stone-50/70 px-5 py-4 text-sm leading-relaxed text-stone-500 dark:border-stone-700/60 dark:bg-stone-900/50 dark:text-stone-400">
+          <p className="home-section hidden rounded-xl border border-stone-200/60 bg-stone-50/70 px-5 py-4 text-sm leading-relaxed text-stone-500 sm:block dark:border-stone-700/60 dark:bg-stone-900/50 dark:text-stone-400">
             <span className="font-medium text-stone-700 dark:text-stone-300">
               {t('home.privacyStrong')}
             </span>{' '}

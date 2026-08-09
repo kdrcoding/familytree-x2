@@ -107,7 +107,7 @@ export function PersonCard({ person, onOpen, onEdit, onDelete }: PersonCardProps
       </ul>
 
       {(onEdit || onDelete) && (
-        <div className="relative z-10 mt-auto flex gap-1.5 border-t border-stone-100 pt-3 dark:border-stone-800">
+        <div className="relative z-10 mt-auto hidden gap-1.5 border-t border-stone-100 pt-3 sm:flex dark:border-stone-800">
           {onEdit && (
             <button
               type="button"

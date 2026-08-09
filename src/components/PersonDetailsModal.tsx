@@ -342,20 +342,17 @@ export function PersonDetailsModal({
       </div>
 
       {editMode && onAddRelative && (
-        <div className="mt-4 flex flex-wrap gap-2 rounded-xl border border-brand-200/70 bg-brand-50/60 p-3 dark:border-brand-900/50 dark:bg-brand-950/30">
-          <p className="w-full text-xs font-medium text-brand-900 dark:text-brand-200">
-            {t('person.addRelativeHint')}
-          </p>
+        <div className="mt-4 flex gap-2">
           <button
             type="button"
-            className="btn-secondary !min-h-10 flex-1"
+            className="btn-secondary !min-h-11 flex-1"
             onClick={() => onAddRelative('spouse', person)}
           >
             <Heart className="h-4 w-4" aria-hidden /> {t('person.addSpouse')}
           </button>
           <button
             type="button"
-            className="btn-secondary !min-h-10 flex-1"
+            className="btn-secondary !min-h-11 flex-1"
             onClick={() => onAddRelative('child', person)}
           >
             <Baby className="h-4 w-4" aria-hidden /> {t('person.addChild')}
