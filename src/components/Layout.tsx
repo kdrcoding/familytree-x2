@@ -1,7 +1,8 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { ChevronDown, Languages, Menu, Moon, Settings, Sun, X } from 'lucide-react';
+import { ChevronDown, Languages, LogOut, Menu, Moon, Settings, Sun, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useConfirm } from '../context/ConfirmContext';
 import { useSettings } from '../context/SettingsContext';
 import { languageCodeLabel, nextLanguage } from '../types/family';
 import { useT } from '../i18n/useT';
@@ -13,7 +14,8 @@ import { PortalMenu } from './OverflowMenu';
 
 export function Layout() {
   const { settings, toggleTheme, setLanguage } = useSettings();
-  const { role } = useAuth();
+  const { role, signOut } = useAuth();
+  const confirm = useConfirm();
   const [menuOpen, setMenuOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const moreBtnRef = useRef<HTMLButtonElement>(null);
@@ -21,6 +23,7 @@ export function Layout() {
   const t = useT();
   const isTreePage = location.pathname === '/tree';
   const easy = role !== 'owner' && Boolean(settings.easyMode);
+  const signedIn = role !== 'viewer';
 
   useEffect(() => {
     setMenuOpen(false);
@@ -28,6 +31,18 @@ export function Layout() {
   }, [location.pathname]);
 
   const cycleLanguage = () => setLanguage(nextLanguage(settings.language));
+
+  const handleSignOut = async () => {
+    const ok = await confirm({
+      title: t('nav.signOutConfirmTitle'),
+      message: t('nav.signOutConfirmMsg'),
+      confirmLabel: t('nav.signOut'),
+      danger: true,
+    });
+    if (!ok) return;
+    setMenuOpen(false);
+    signOut();
+  };
 
   const primaryNav = [
     { to: '/', label: t('nav.home') },
@@ -155,6 +170,17 @@ export function Layout() {
                 <Moon className="h-5 w-5" aria-hidden />
               )}
             </button>
+            {signedIn && (
+              <button
+                type="button"
+                className="icon-btn !min-h-10 !min-w-10"
+                onClick={() => void handleSignOut()}
+                title={t('nav.signOut')}
+                aria-label={t('nav.signOut')}
+              >
+                <LogOut className="h-5 w-5" aria-hidden />
+              </button>
+            )}
             <NavLink
               to="/settings"
               className={iconBtnClass}
@@ -200,6 +226,18 @@ export function Layout() {
                   </NavLink>
                 </li>
               ))}
+              {signedIn && (
+                <li>
+                  <button
+                    type="button"
+                    className="flex w-full items-center gap-2 rounded-xl px-3.5 py-2.5 text-left text-base font-semibold text-rose-700 hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-950/40"
+                    onClick={() => void handleSignOut()}
+                  >
+                    <LogOut className="h-5 w-5" aria-hidden />
+                    {t('nav.signOut')}
+                  </button>
+                </li>
+              )}
             </ul>
           </nav>
         )}

@@ -632,14 +632,6 @@ html:not(.dark) .home-hero__pedigree {
   @apply bg-brand-600 text-white dark:bg-brand-500 dark:text-brand-950;
 }
 
-/* How-to illustrated panels */
-.home-guide-mock {
-  @apply aspect-[16/9] w-full overflow-hidden rounded-xl border border-stone-200/80 bg-gradient-to-br from-stone-50 to-brand-50/40 text-stone-400 dark:border-stone-700 dark:from-stone-900 dark:to-brand-950/30 dark:text-stone-500;
-}
-.home-guide-action {
-  @apply inline-flex min-h-10 items-center justify-center rounded-lg bg-brand-700 px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:bg-brand-600 dark:hover:bg-brand-500;
-}
-
 /* Home list items — hover-lift for interactive rows */
 .home-list-item {
   @apply flex items-center gap-3 rounded-xl px-3 py-3 transition-all duration-150 hover:bg-[var(--shajira-lift,#fafaf9)] hover:shadow-sm hover:-translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-500 sm:px-4 dark:hover:bg-stone-800/60;

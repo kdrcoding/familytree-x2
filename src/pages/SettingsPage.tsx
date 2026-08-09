@@ -21,6 +21,7 @@ import {
   UserPlus,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useConfirm } from '../context/ConfirmContext';
 import { useSettings } from '../context/SettingsContext';
 import { useToast } from '../context/ToastContext';
 import { useDataTransfer } from '../hooks/useDataTransfer';
@@ -440,6 +441,7 @@ function PhotosCard() {
 export function SettingsPage() {
   const { settings, setTheme, setLanguage, setPrivacy, setEasyMode } = useSettings();
   const { role, canEdit, canDelete, signOut } = useAuth();
+  const confirm = useConfirm();
   const { exportJson, importFromFile, resetSample } = useDataTransfer();
   const { toast } = useToast();
   const t = useT();
@@ -460,6 +462,16 @@ export function SettingsPage() {
       : role === 'editor'
         ? t('settings.roleEditor')
         : t('settings.roleViewer');
+
+  const handleSignOut = async () => {
+    const ok = await confirm({
+      title: t('nav.signOutConfirmTitle'),
+      message: t('nav.signOutConfirmMsg'),
+      confirmLabel: t('nav.signOut'),
+      danger: true,
+    });
+    if (ok) signOut();
+  };
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6">
@@ -576,7 +588,7 @@ export function SettingsPage() {
               <Eye className="h-3 w-3" aria-hidden />
               {t('settings.currentRole', { role: roleLabel })}
             </span>
-            <button type="button" className="btn-secondary" onClick={signOut}>
+            <button type="button" className="btn-secondary" onClick={() => void handleSignOut()}>
               <LogOut className="h-4 w-4" aria-hidden /> {t('settings.signOut')}
             </button>
           </div>
@@ -672,7 +684,7 @@ export function SettingsPage() {
             {t('settings.currentRole', { role: roleLabel })}
           </span>
           {canEdit ? (
-            <button type="button" className="btn-secondary" onClick={signOut}>
+            <button type="button" className="btn-secondary" onClick={() => void handleSignOut()}>
               <LogOut className="h-4 w-4" aria-hidden /> {t('settings.signOut')}
             </button>
           ) : (

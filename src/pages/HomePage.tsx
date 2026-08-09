@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   ArrowRight,
   CalendarPlus,
@@ -10,7 +10,6 @@ import {
   Users,
 } from 'lucide-react';
 import { JoinFamilyModal } from '../components/JoinFamilyModal';
-import { HomeGuide } from '../components/HomeGuide';
 import { PersonSearch } from '../components/PersonSearch';
 import { BrandMark } from '../components/BrandLogo';
 import { useFamily } from '../context/FamilyContext';
@@ -41,7 +40,6 @@ export function HomePage() {
   const language = useLanguage();
   const [joinOpen, setJoinOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-  const location = useLocation();
   const { role } = useAuth();
   const easy = role !== 'owner' && Boolean(settings.easyMode);
   const stats = useMemo(() => computeStats(people), [people]);
@@ -93,15 +91,6 @@ export function HomePage() {
       toast(t('invite.openedToast'), 'info');
     }
   }, [searchParams, setSearchParams, toast, t]);
-
-  // About / deep links to #home-guide land on the how-to section.
-  useEffect(() => {
-    if (location.hash !== '#home-guide') return;
-    const id = window.setTimeout(() => {
-      document.getElementById('home-guide')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 50);
-    return () => window.clearTimeout(id);
-  }, [location.hash, location.pathname]);
 
   const whenLabel = (isToday: boolean, daysUntil: number) =>
     isToday
@@ -273,8 +262,6 @@ export function HomePage() {
             </div>
           </section>
         )}
-
-        <HomeGuide onAddSelf={() => setJoinOpen(true)} />
 
         {!easy && (
           <section
