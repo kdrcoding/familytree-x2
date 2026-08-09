@@ -43,6 +43,8 @@ interface PersonDetailsModalProps {
    */
   onRequestEdit?: (person: FamilyPerson) => void;
   onCopyLink?: (person: FamilyPerson) => void;
+  /** Add a spouse or child linked to this person (editors / owners). */
+  onAddRelative?: (kind: 'spouse' | 'child', person: FamilyPerson) => void;
 }
 
 function DetailRow({
@@ -193,6 +195,7 @@ export function PersonDetailsModal({
   onDelete,
   onRequestEdit,
   onCopyLink,
+  onAddRelative,
 }: PersonDetailsModalProps) {
   const { index, generations, getLabel } = useFamily();
   const privacy = usePrivacy();
@@ -338,10 +341,32 @@ export function PersonDetailsModal({
         )}
       </div>
 
+      {editMode && onAddRelative && (
+        <div className="mt-4 flex flex-wrap gap-2 rounded-xl border border-brand-200/70 bg-brand-50/60 p-3 dark:border-brand-900/50 dark:bg-brand-950/30">
+          <p className="w-full text-xs font-medium text-brand-900 dark:text-brand-200">
+            {t('person.addRelativeHint')}
+          </p>
+          <button
+            type="button"
+            className="btn-secondary !min-h-10 flex-1"
+            onClick={() => onAddRelative('spouse', person)}
+          >
+            <Heart className="h-4 w-4" aria-hidden /> {t('person.addSpouse')}
+          </button>
+          <button
+            type="button"
+            className="btn-secondary !min-h-10 flex-1"
+            onClick={() => onAddRelative('child', person)}
+          >
+            <Baby className="h-4 w-4" aria-hidden /> {t('person.addChild')}
+          </button>
+        </div>
+      )}
+
       <div className="sticky bottom-[calc(-1*max(1rem,env(safe-area-inset-bottom)))] z-10 -mx-4 mb-[calc(-1*max(1rem,env(safe-area-inset-bottom)))] mt-4 border-t border-stone-200 bg-white px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:-mx-5 sm:mb-[calc(-1*max(1.25rem,env(safe-area-inset-bottom)))] sm:mt-5 sm:px-5 dark:border-stone-700 dark:bg-stone-900">
         {editMode ? (
           <div className="flex gap-2">
-            <button type="button" className="btn-secondary !min-h-11 flex-1" onClick={() => onEdit?.(person)}>
+            <button type="button" className="btn-primary !min-h-11 flex-1" onClick={() => onEdit?.(person)}>
               <Pencil className="h-4 w-4" aria-hidden /> {t('person.edit')}
             </button>
             {canDelete && (

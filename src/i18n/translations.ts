@@ -198,11 +198,13 @@ export const en = {
   'tree.importTitle': 'Import family data from a JSON file',
   'tree.addPerson': 'Add person',
   'tree.addYourself': 'Add yourself',
-  'tree.addYourselfTitle': 'Add yourself to the tree — no password needed',
-  'tree.editMode': 'Edit mode',
+  'tree.addYourselfTitle': 'Add yourself to the tree',
+  'tree.editMode': 'Edit',
   'tree.editing': 'Editing',
   'tree.signOutTitle': 'Signed in as {role} — click to sign out',
   'tree.signOutLabel': 'Sign out of editing',
+  'tree.editHint':
+    'Tip: open someone to Edit them, or tap Add spouse / Add child. Turn on Edit for + buttons on the tree cards.',
   'tree.lockedToast': 'Editing locked again.',
   'tree.clearHighlight': 'Clear highlight',
   'tree.generationN': 'Generation {n}',
@@ -375,6 +377,9 @@ export const en = {
   'person.childrenOther': 'Children (other parent not listed)',
   'person.viewHint': 'Tap Edit to add or correct this information.',
   'person.edit': 'Edit',
+  'person.addRelativeHint': 'Add someone related to them',
+  'person.addSpouse': 'Add spouse',
+  'person.addChild': 'Add child',
   'person.delete': 'Delete',
   'person.addKind': 'Add {kind}',
   'person.child': 'child',
@@ -591,8 +596,24 @@ export const en = {
 
   // About page
   'about.title': 'About this family tree',
+  'about.howTitle': 'How to use this site',
+  'about.howIntro': 'Four short steps — most families only need the first three.',
+  'about.howStep': 'Step {n}',
+  'about.howStep1Title': 'Find someone',
+  'about.howStep1Text':
+    'On Home or Family Tree, type a name in search. Tap a result to open their card.',
+  'about.howStep2Title': 'Edit a person',
+  'about.howStep2Text':
+    'Open anyone, then tap Edit. Change names, dates, photo, and more — save when you are done.',
+  'about.howStep3Title': 'Add a spouse or child',
+  'about.howStep3Text':
+    'Open a person and use Add spouse or Add child. Or turn on Edit on the tree to use the + buttons on cards.',
+  'about.howStep4Title': 'Add yourself',
+  'about.howStep4Text':
+    'New to the tree? Tap Add yourself, say how you connect, and fill in your details — you appear right away.',
+  'about.howOpenTree': 'Open family tree',
   'about.guideLink': 'How to use the app',
-  'about.guideHint': 'A short illustrated guide is on the Home page.',
+  'about.guideHint': 'See the steps at the top of this page.',
   'about.purposeTitle': 'Purpose',
   'about.purposeText':
     "This website keeps our family's story in one living place: who we are, where we come from, and how every branch connects back to the original couple at the top of the tree. It replaces scattered notes, old photo albums and half-remembered dates with something everyone in the family can explore from any phone or computer.",
@@ -602,11 +623,11 @@ export const en = {
   'about.privacyTitle': 'Privacy considerations',
   'about.privacyText':
     'Family sites deserve care. The Settings page has a public privacy mode that hides exact dates, cities, occupations, biographies, photos and the ages of minors. We deliberately store no addresses, phone numbers, email addresses or documents. If you are in this tree and want something changed or removed, tell the family administrator and it will be done.',
-  'about.contributeTitle': 'How to contribute updates',
+  'about.contributeTitle': 'Who can change what',
   'about.contributeText1':
-    'Family members with the family password can unlock edit mode on the Family Tree page to add new people (a new baby, a new spouse) and edit details. Deleting people and changing relationships is reserved for the owner.',
+    'Anyone with the family password can add people and edit details. Open a person to edit them, or add a spouse/child from their card. Deleting people and changing existing relationships is reserved for the owner.',
   'about.contributeText2':
-    'Because this site has no server, your edits are saved in your own browser. To share them with everyone: make your changes, use Export to download the family JSON file, and send it to the owner — they import it and republish the site so everyone sees the update.',
+    'Changes save live for the whole family — no file export needed. Settings → Export is only a backup copy if you want one.',
 
   // Settings page
   'settings.title': 'Settings',
@@ -615,7 +636,7 @@ export const en = {
     'Larger text, bigger buttons, and a shorter menu — easier for older family members. Off by default; turns on automatically if your name in the tree is over 50.',
   'settings.easyLabel': 'Use Easy Mode',
   'settings.easyDesc':
-    'Hides Map, Statistics and About from the menu. Auto-on for relatives over 50 (matched from the name you enter at sign-in).',
+    'Hides Map and Statistics from the menu. Auto-on for relatives over 50 (matched from the name you enter at sign-in).',
   'settings.showAdvanced': 'Show advanced settings',
   'settings.domainTitle': 'Your own website address',
   'settings.domainIntro':
@@ -1002,11 +1023,13 @@ export const uz: Record<TKey, string> = {
   'tree.importTitle': "JSON fayldan oila ma'lumotlarini yuklash",
   'tree.addPerson': "Odam qo'shish",
   'tree.addYourself': "O'zingizni qo'shing",
-  'tree.addYourselfTitle': "O'zingizni shajaraga qo'shing — parol kerak emas",
+  'tree.addYourselfTitle': "O'zingizni shajaraga qo'shing",
   'tree.editMode': 'Tahrirlash',
   'tree.editing': 'Tahrirlanmoqda',
   'tree.signOutTitle': '{role} sifatida kirilgan — chiqish uchun bosing',
   'tree.signOutLabel': 'Tahrirlashdan chiqish',
+  'tree.editHint':
+    'Maslahat: odamni ochib Tahrirlash yoki Turmush o‘rtoq / Farzand qo‘shing. Kartochkalardagi + uchun Tahrirlashni yoqing.',
   'tree.lockedToast': 'Tahrirlash yana qulflandi.',
   'tree.clearHighlight': 'Belgilashni olib tashlash',
   'tree.generationN': '{n}-avlod',
@@ -1172,6 +1195,9 @@ export const uz: Record<TKey, string> = {
   'person.childrenOther': "Farzandlari (ikkinchi ota-ona ko'rsatilmagan)",
   'person.viewHint': "Ma'lumot qo'shish yoki tuzatish uchun Tahrirlash tugmasini bosing.",
   'person.edit': 'Tahrirlash',
+  'person.addRelativeHint': 'Ular bilan bog‘liq odam qo‘shish',
+  'person.addSpouse': 'Turmush o‘rtoq',
+  'person.addChild': 'Farzand',
   'person.delete': "O'chirish",
   'person.addKind': '{kind} qo‘shish',
   'person.child': 'farzand',
@@ -1381,8 +1407,24 @@ export const uz: Record<TKey, string> = {
   'stats.perCountry': 'Har mamlakatdagi odamlar',
 
   'about.title': 'Bu shajara haqida',
+  'about.howTitle': 'Saytdan qanday foydalanish',
+  'about.howIntro': 'To‘rtta qisqa qadam — ko‘pchilikka birinchi uchtasi yetadi.',
+  'about.howStep': '{n}-qadam',
+  'about.howStep1Title': 'Odamni toping',
+  'about.howStep1Text':
+    'Bosh yoki Shajara sahifasida qidiruvga ism yozing. Natijani bosib kartochkani oching.',
+  'about.howStep2Title': 'Odamni tahrirlang',
+  'about.howStep2Text':
+    'Istalgan odamni oching, Tahrirlashni bosing. Ism, sana, rasm va boshqalarni o‘zgartiring — saqlang.',
+  'about.howStep3Title': 'Turmush o‘rtoq yoki farzand qo‘shing',
+  'about.howStep3Text':
+    'Odamni ochib «Turmush o‘rtoq» yoki «Farzand»ni bosing. Yoki shajarada Tahrirlashni yoqib kartochkadagi + dan foydalaning.',
+  'about.howStep4Title': 'O‘zingizni qo‘shing',
+  'about.howStep4Text':
+    'Shajarada yo‘qmisiz? «O‘zingizni qo‘shing»ni bosing, qanday bog‘lanishingizni ayting va ma’lumotlarni to‘ldiring — darhol ko‘rinasiz.',
+  'about.howOpenTree': 'Shajarani ochish',
   'about.guideLink': 'Ilovani qanday ishlatish',
-  'about.guideHint': 'Qisqa ko‘rsatmalar Bosh sahifada.',
+  'about.guideHint': 'Qadamlar shu sahifa tepasida.',
   'about.purposeTitle': 'Maqsad',
   'about.purposeText':
     "Bu sayt oilamiz tarixini bir joyda saqlaydi: biz kimmiz, qayerdan kelganmiz va har bir shox shajara tepasidagi asoschi juftlikka qanday bog'lanadi. Tarqoq yozuvlar, eski albomlar va yarim unutilgan sanalar o'rniga — istalgan telefon yoki kompyuterdan ochiladigan yagona manba.",
@@ -1392,11 +1434,11 @@ export const uz: Record<TKey, string> = {
   'about.privacyTitle': 'Maxfiylik masalalari',
   'about.privacyText':
     "Oilaviy saytlarga ehtiyotkorlik kerak. Sozlamalar sahifasida aniq sanalar, shaharlar, kasblar, tarjimai hollar, rasmlar va voyaga yetmaganlar yoshini yashiradigan maxfiylik rejimi bor. Manzillar, telefon raqamlari, elektron pochta va hujjatlarni ataylab saqlamaymiz. Agar siz shu shajarada bo'lsangiz va biror narsani o'zgartirish yoki o'chirishni istasangiz, oila administratoriga ayting — bajariladi.",
-  'about.contributeTitle': "Yangiliklarni qanday qo'shish mumkin",
+  'about.contributeTitle': 'Kim nima o‘zgartira oladi',
   'about.contributeText1':
-    "Oila paroliga ega a'zolar Shajara sahifasida tahrirlash rejimini ochib, yangi odamlarni (yangi chaqaloq, yangi kelin-kuyov) qo'shishlari va ma'lumotlarni tahrirlashlari mumkin. O'chirish va aloqalarni o'zgartirish faqat egasiga tegishli.",
+    "Oila paroliga ega har kim odam qo‘shishi va ma’lumotlarni tahrirlashi mumkin. Odamni ochib tahrirlang yoki uning kartochkasidan turmush o‘rtoq/farzand qo‘shing. O‘chirish va mavjud aloqalarni o‘zgartirish faqat egasiga tegishli.",
   'about.contributeText2':
-    "Saytda server yo'q, shuning uchun o'zgarishlaringiz o'z brauzeringizda saqlanadi. Hamma ko'rishi uchun: o'zgarishlarni kiriting, «Eksport» bilan JSON faylni yuklab oling va egasiga yuboring — u import qilib saytni qayta e'lon qiladi.",
+    "O‘zgarishlar butun oila uchun darhol saqlanadi — fayl eksporti shart emas. Sozlamalar → Eksport faqat zaxira nusxa uchun.",
 
   'settings.title': 'Sozlamalar',
   'settings.easyTitle': 'Oson rejim',
@@ -1404,7 +1446,7 @@ export const uz: Record<TKey, string> = {
     "Katta yozuv, katta tugmalar va qisqa menyu — keksa oila a’zolari uchun qulayroq. Odatiy holda o‘chiq; shajaradagi ismingiz 50 dan katta bo‘lsa avtomatik yonadi.",
   'settings.easyLabel': 'Oson rejimni yoqish',
   'settings.easyDesc':
-    'Menyudan Xarita, Statistika va Haqida yashiriladi. 50 dan katta qarindoshlar uchun (kirishdagi ism bo‘yicha) avtomatik yoqiladi.',
+    'Menyudan Xarita va Statistika yashiriladi. 50 dan katta qarindoshlar uchun (kirishdagi ism bo‘yicha) avtomatik yoqiladi.',
   'settings.showAdvanced': 'Qo‘shimcha sozlamalarni ko‘rsatish',
   'settings.domainTitle': 'O‘z sayt manzilingiz',
   'settings.domainIntro':

@@ -10,7 +10,7 @@ import {
   useReactFlow,
 } from '@xyflow/react';
 import type { Edge, EdgeTypes, Node, NodeTypes, ReactFlowInstance } from '@xyflow/react';
-import { Lock, LockOpen, Maximize2, Search, UserPlus, UserRoundPlus, Users, X, Share2, ZoomIn } from 'lucide-react';
+import { Lock, LockOpen, Maximize2, Pencil, Search, UserPlus, UserRoundPlus, Users, X, Share2, ZoomIn } from 'lucide-react';
 import type { FamilyPerson, RelationLink } from '../types/family';
 import { useAuth } from '../context/AuthContext';
 import { useConfirm } from '../context/ConfirmContext';
@@ -19,7 +19,7 @@ import { useSettings } from '../context/SettingsContext';
 import { useToast } from '../context/ToastContext';
 import { usePersistentState } from '../hooks/usePersistentState';
 import { useT } from '../i18n/useT';
-import { STORAGE_KEYS } from '../utils/storage';
+import { loadJson, saveJson, STORAGE_KEYS } from '../utils/storage';
 import { getAncestorIds, fullName } from '../utils/family';
 import { matchesSearch } from '../utils/filters';
 import { MadeByKadir } from '../components/MadeByKadir';
@@ -415,11 +415,24 @@ export function TreePage() {
   const [focusId, setFocusId] = useState<string | null>(null);
   const [exportBusy, setExportBusy] = useState(false);
   const clearFocus = useCallback(() => setFocusId(null), []);
+  const [showEditHint, setShowEditHint] = useState(
+    () => loadJson<boolean>(STORAGE_KEYS.treeTipSeen, (v): v is boolean => typeof v === 'boolean') !== true,
+  );
+
+  const dismissEditHint = useCallback(() => {
+    saveJson(STORAGE_KEYS.treeTipSeen, true);
+    setShowEditHint(false);
+  }, []);
 
   useEffect(() => {
     // Keep browse mode calm after login; turn edit tools off if they lose access.
     if (!canEdit) setEditMode(false);
   }, [canEdit]);
+
+  // Once they turn edit mode on, the tip has done its job.
+  useEffect(() => {
+    if (editMode && showEditHint) dismissEditHint();
+  }, [editMode, showEditHint, dismissEditHint]);
 
   // Drop stale details if the person was deleted / removed by live sync.
   useEffect(() => {
@@ -612,7 +625,7 @@ export function TreePage() {
               <Users className="h-4 w-4" aria-hidden />
               <span className="hidden sm:inline">{t('tree.listView')}</span>
             </Link>
-            {editMode && (
+            {canEdit && (
               <button
                 type="button"
                 className="btn-primary !hidden !min-h-10 sm:!inline-flex"
@@ -627,7 +640,7 @@ export function TreePage() {
               className="icon-btn !min-h-10 !min-w-10"
               onClick={() => setJoinOpen(true)}
               aria-label={t('tree.addYourself')}
-              title={t('tree.addYourself')}
+              title={t('tree.addYourselfTitle')}
             >
               <UserRoundPlus className="h-4 w-4" aria-hidden />
             </button>
@@ -653,17 +666,47 @@ export function TreePage() {
               title={editMode ? t('tree.editing') : t('tree.editMode')}
             >
               {canEdit ? (
-                <LockOpen className="h-4 w-4" aria-hidden />
+                editMode ? (
+                  <LockOpen className="h-4 w-4" aria-hidden />
+                ) : (
+                  <Pencil className="h-4 w-4" aria-hidden />
+                )
               ) : (
                 <Lock className="h-4 w-4" aria-hidden />
               )}
-              <span className="hidden md:inline">
+              <span className="hidden sm:inline">
                 {editMode ? t('tree.editing') : t('tree.editMode')}
               </span>
             </button>
           </div>
         </div>
       </div>
+
+      {canEdit && !editMode && showEditHint && (
+        <div className="border-b border-brand-200/80 bg-brand-50 px-3 py-2 dark:border-brand-900/40 dark:bg-brand-950/50">
+          <div className="mx-auto flex max-w-[1600px] items-start gap-2 sm:items-center">
+            <Pencil className="mt-0.5 h-4 w-4 shrink-0 text-brand-700 dark:text-brand-300 sm:mt-0" aria-hidden />
+            <p className="min-w-0 flex-1 text-sm text-brand-950 dark:text-brand-100">
+              {t('tree.editHint')}
+            </p>
+            <button
+              type="button"
+              className="btn-primary !min-h-9 shrink-0 !px-3 !text-sm"
+              onClick={() => setEditMode(true)}
+            >
+              {t('tree.editMode')}
+            </button>
+            <button
+              type="button"
+              className="icon-btn !min-h-9 !min-w-9 shrink-0"
+              onClick={dismissEditHint}
+              aria-label={t('common.close')}
+            >
+              <X className="h-4 w-4" aria-hidden />
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="relative min-h-0 flex-1 overflow-hidden">
         <div className="absolute inset-0 bg-[var(--shajira-page,#e7e5e4)] dark:bg-stone-950">
@@ -680,7 +723,7 @@ export function TreePage() {
           </TreeInteractionContext.Provider>
         </div>
 
-        {editMode && (
+        {canEdit && (
           <button
             type="button"
             className="tree-add-fab btn-primary !min-h-12 !min-w-12 rounded-full shadow-lg shadow-brand-900/25 sm:hidden"
@@ -707,6 +750,10 @@ export function TreePage() {
           onDelete={handleDelete}
           onRequestEdit={requestEdit}
           onCopyLink={copyPersonLink}
+          onAddRelative={(kind, person) => {
+            closeDetails();
+            setForm({ link: { kind, targetId: person.id } });
+          }}
         />
       )}
       {form && (

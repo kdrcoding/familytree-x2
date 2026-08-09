@@ -32,6 +32,7 @@ export function MembersPage() {
   const [detailsId, setDetailsId] = useState<string | null>(null);
   const [form, setForm] = useState<{ person?: FamilyPerson; link?: RelationLink } | null>(null);
   const [unlockOpen, setUnlockOpen] = useState(false);
+  const [pendingEditId, setPendingEditId] = useState<string | null>(null);
 
   const sorts: { key: SortKey; label: string }[] = [
     { key: 'name', label: t('members.sortName') },
@@ -69,6 +70,16 @@ export function MembersPage() {
     if (!saved) return;
     setDetailsId(null);
     toast(t('delete.done', { name: fullName(person) }));
+  };
+
+  const requestEdit = (person: FamilyPerson) => {
+    setDetailsId(null);
+    if (canEdit) {
+      setForm({ person });
+    } else {
+      setPendingEditId(person.id);
+      setUnlockOpen(true);
+    }
   };
 
   return (
@@ -170,11 +181,29 @@ export function MembersPage() {
             setForm({ person });
           }}
           onDelete={handleDelete}
+          onRequestEdit={requestEdit}
+          onAddRelative={(kind, person) => {
+            setDetailsId(null);
+            setForm({ link: { kind, targetId: person.id } });
+          }}
         />
       )}
       {form && <PersonFormModal {...form} onClose={() => setForm(null)} />}
       {unlockOpen && (
-        <UnlockModal onClose={() => setUnlockOpen(false)} onUnlocked={() => setForm({})} />
+        <UnlockModal
+          onClose={() => {
+            setUnlockOpen(false);
+            setPendingEditId(null);
+          }}
+          onUnlocked={() => {
+            const pending = pendingEditId
+              ? people.find((p) => p.id === pendingEditId)
+              : null;
+            if (pending) setForm({ person: pending });
+            else setForm({});
+            setPendingEditId(null);
+          }}
+        />
       )}
     </div>
   );

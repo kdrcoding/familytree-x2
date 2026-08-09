@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Languages, Loader2, LockKeyhole, Smile } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -16,8 +16,9 @@ function readSavedName(): string {
 }
 
 /**
- * Site gate: password only to enter. After unlock, ask for a first name once
- * (for the change log) — soft welcome, not a second login screen.
+ * Site gate: password only to enter. After every successful unlock, ask for a
+ * first name (change log) — soft welcome, not a second login. Returning sessions
+ * that already have a saved name skip straight into the app.
  */
 export function AppLockGate({ children }: { children: ReactNode }) {
   const { role, ready, signIn } = useAuth();
@@ -29,9 +30,22 @@ export function AppLockGate({ children }: { children: ReactNode }) {
   const [savedName, setSavedName] = useState(readSavedName);
   const [nameDraft, setNameDraft] = useState(savedName);
   const [nameError, setNameError] = useState('');
+  // True right after a password unlock this visit — forces the name step even
+  // if a previous visitor left a name in localStorage on this device.
+  const [awaitingName, setAwaitingName] = useState(false);
 
   const unlocked = ready && role !== 'viewer';
-  const needsName = unlocked && savedName.length < 2;
+  const needsName = unlocked && (awaitingName || savedName.length < 2);
+
+  // If auth restores a session without a saved name, keep blocking on the name step.
+  useEffect(() => {
+    if (!ready || role === 'viewer') return;
+    if (readSavedName().length < 2) {
+      setAwaitingName(true);
+      setSavedName('');
+      setNameDraft('');
+    }
+  }, [ready, role]);
 
   if (unlocked && !needsName) return <>{children}</>;
 
@@ -48,10 +62,12 @@ export function AppLockGate({ children }: { children: ReactNode }) {
       if (!found) {
         setError(t('gate.wrong'));
       } else {
-        // Refresh in case a name was already stored on this device.
+        // Always collect a name after unlock. Prefill only if this device already
+        // has one — user must still tap Continue so it is not skipped.
         const existing = readSavedName();
-        setSavedName(existing);
         setNameDraft(existing);
+        setNameError('');
+        setAwaitingName(true);
       }
     } catch (err) {
       console.error('Sign-in failed:', err);
@@ -70,6 +86,7 @@ export function AppLockGate({ children }: { children: ReactNode }) {
     }
     saveJson(STORAGE_KEYS.displayName, trimmed);
     setSavedName(trimmed);
+    setAwaitingName(false);
   };
 
   return (
@@ -104,6 +121,8 @@ export function AppLockGate({ children }: { children: ReactNode }) {
                 autoComplete="given-name"
                 maxLength={40}
                 autoFocus
+                required
+                minLength={2}
                 placeholder={t('gate.namePlaceholder')}
               />
               <span className="mt-1.5 block text-xs leading-relaxed text-stone-400 dark:text-stone-500">
@@ -146,6 +165,7 @@ export function AppLockGate({ children }: { children: ReactNode }) {
                 }}
                 autoComplete="current-password"
                 autoFocus
+                required
               />
               {error && (
                 <span role="alert" className="mt-1 block text-xs text-red-600 dark:text-red-400">

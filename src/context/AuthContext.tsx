@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase';
 import { loadJson, saveJson, removeKey, STORAGE_KEYS } from '../utils/storage';
 
 const AUTH_KEY = STORAGE_KEYS.auth;
+const DISPLAY_NAME_KEY = STORAGE_KEYS.displayName;
 
 interface AuthContextValue {
   role: Role;
@@ -106,6 +107,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(() => {
     if (supabase) void supabase.auth.signOut();
     removeKey(AUTH_KEY);
+    // Next visitor must enter their own name after the password.
+    removeKey(DISPLAY_NAME_KEY);
     setHasDbSession(false);
     setRole('viewer');
   }, []);
