@@ -224,9 +224,9 @@ export const en = {
   'tree.resetView': 'Reset view',
   'tree.zoomReadable': 'Zoom in (readable)',
   'tree.tip':
-    'Tip: type a name to jump. Drag to move · pinch to zoom. Tap the rose rings between a couple to see or edit their wedding date.',
+    'Tip: type a name to jump. Drag to move · pinch to zoom. Tap the rings between a couple to see or edit their wedding date.',
   'tree.ringsTip':
-    'Tap the rose rings between two people to open their wedding date — you can add or edit it there.',
+    'Tap the rings between two people to open their wedding date — you can add or edit it there.',
   'tree.copyLink': 'Copy share link',
   'tree.linkCopied': 'Share link copied to clipboard.',
   'tree.linkCopyFail': 'Link added to the address bar — copy it from there.',
@@ -243,7 +243,7 @@ export const en = {
   'tree.pngFail': 'PNG export failed.',
   'tree.pngEmpty': 'There is nothing to export yet.',
   'tree.legendTitle': 'How to read the tree',
-  'tree.legendMarried': 'Tap rose rings — wedding date / edit',
+  'tree.legendMarried': 'Tap rings — wedding date / edit',
   'couple.title': 'Couple',
   'couple.tapHint': 'Wedding rings — tap for date and details',
   'couple.subtitle': 'Wedding date and anniversary for this pair',
