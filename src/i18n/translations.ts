@@ -1078,9 +1078,9 @@ export const uz: Record<TKey, string> = {
   'tree.resetView': 'Ko‘rinishni tiklash',
   'tree.zoomReadable': 'Kattalashtirish (o‘qiladi)',
   'tree.tip':
-    'Maslahat: ism yozib toping. Surish · chimding. Er-xotin orasidagi pushti uzuklarni bosing — nikoh sanasini ko‘rish yoki tahrirlash.',
+    'Maslahat: ism yozib toping. Surish · chimding. Er-xotin orasidagi uzuklarni bosing — nikoh sanasini ko‘rish yoki tahrirlash.',
   'tree.ringsTip':
-    'Ikki odam orasidagi pushti uzuklarni bosing — nikoh sanasini ochasiz, qo‘shish yoki tahrirlash mumkin.',
+    'Ikki odam orasidagi uzuklarni bosing — nikoh sanasini ochasiz, qo‘shish yoki tahrirlash mumkin.',
   'tree.copyLink': 'Havolani nusxalash',
   'tree.linkCopied': 'Havola nusxalandi.',
   'tree.linkCopyFail': 'Havola manzil satriga qo‘shildi — o‘sha yerdan nusxalang.',
@@ -1097,7 +1097,7 @@ export const uz: Record<TKey, string> = {
   'tree.pngFail': 'PNG eksport qilinmadi.',
   'tree.pngEmpty': 'Hozircha eksport qiladigan narsa yo‘q.',
   'tree.legendTitle': "Shajarani qanday o'qish kerak",
-  'tree.legendMarried': 'Pushti uzuklar — nikoh sanasi / tahrir',
+  'tree.legendMarried': 'Uzuklar — nikoh sanasi / tahrir',
   'couple.title': 'Juftlik',
   'couple.tapHint': 'Nikoh uzuklari — sana va ma’lumot uchun bosing',
   'couple.subtitle': 'Ushbu juftlikning nikoh sanasi va yubileyi',
