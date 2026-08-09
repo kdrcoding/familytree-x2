@@ -19,7 +19,7 @@ import { useSettings } from '../context/SettingsContext';
 import { useToast } from '../context/ToastContext';
 import { usePersistentState } from '../hooks/usePersistentState';
 import { useT } from '../i18n/useT';
-import { STORAGE_KEYS } from '../utils/storage';
+import { loadJson, saveJson, STORAGE_KEYS } from '../utils/storage';
 import { getAncestorIds, fullName } from '../utils/family';
 import { matchesSearch } from '../utils/filters';
 import { MadeByKadir } from '../components/MadeByKadir';
@@ -203,6 +203,24 @@ function TreeCanvas({
   useEffect(() => {
     if (easyMode) setLegendOpen(false);
   }, [easyMode]);
+  const [tipVisible, setTipVisible] = useState(() => {
+    if (easyMode) return false;
+    return loadJson<boolean>(STORAGE_KEYS.treeTipSeen, (v): v is boolean => typeof v === 'boolean') !== true;
+  });
+  const [ringsTipVisible, setRingsTipVisible] = useState(() => {
+    return (
+      loadJson<boolean>(STORAGE_KEYS.treeRingsTipSeen, (v): v is boolean => typeof v === 'boolean') !==
+      true
+    );
+  });
+  const dismissRingsTip = () => {
+    setRingsTipVisible(false);
+    saveJson(STORAGE_KEYS.treeRingsTipSeen, true);
+  };
+  const dismissTip = () => {
+    setTipVisible(false);
+    saveJson(STORAGE_KEYS.treeTipSeen, true);
+  };
   const didInitialFocus = useRef(false);
   const startZoom = easyMode ? START_ZOOM_EASY : isPhone ? START_ZOOM_PHONE : START_ZOOM;
   const focusZoom = easyMode ? FOCUS_ZOOM_EASY : FOCUS_ZOOM;
@@ -305,11 +323,13 @@ function TreeCanvas({
               </div>
               <ul className="space-y-1.5 text-stone-600 dark:text-stone-300">
                 <li className="flex items-center gap-2">
-                  <span aria-hidden className="relative inline-flex h-3 w-7 items-center justify-center">
-                    <span className="absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 rounded bg-rose-400 dark:bg-rose-500" />
+                  <span
+                    aria-hidden
+                    className="relative inline-flex h-5 w-9 items-center justify-center rounded-full bg-rose-100 ring-1 ring-rose-400 dark:bg-rose-950 dark:ring-rose-500"
+                  >
                     <span className="relative z-[1] flex -space-x-1">
-                      <span className="inline-block h-2.5 w-2.5 rounded-full border-[1.5px] border-rose-500 bg-transparent dark:border-rose-400" />
-                      <span className="inline-block h-2.5 w-2.5 rounded-full border-[1.5px] border-rose-500 bg-transparent dark:border-rose-400" />
+                      <span className="inline-block h-3 w-3 rounded-full border-[2px] border-rose-600 bg-transparent dark:border-rose-300" />
+                      <span className="inline-block h-3 w-3 rounded-full border-[2px] border-rose-600 bg-transparent dark:border-rose-300" />
                     </span>
                   </span>
                   <span>{t('tree.legendMarried')}</span>
@@ -348,6 +368,49 @@ function TreeCanvas({
               {t('tree.legendTitle')}
             </button>
           )}
+        </Panel>
+      )}
+      {tipVisible && (
+        <Panel position="top-center" className="!m-2 sm:!m-3">
+          <div className="tree-tip">
+            <div className="flex items-start gap-2">
+              <p className="flex-1 leading-snug text-stone-700 dark:text-stone-200">{t('tree.tip')}</p>
+              <button
+                type="button"
+                className="icon-btn !h-8 !w-8 shrink-0"
+                onClick={dismissTip}
+                aria-label={t('common.close')}
+              >
+                <X className="h-4 w-4" aria-hidden />
+              </button>
+            </div>
+          </div>
+        </Panel>
+      )}
+      {!tipVisible && ringsTipVisible && (
+        <Panel position="top-center" className="!m-2 sm:!m-3">
+          <div className="tree-tip tree-tip--rings">
+            <div className="flex items-start gap-2">
+              <span
+                aria-hidden
+                className="mt-0.5 inline-flex h-8 w-11 shrink-0 items-center justify-center rounded-full bg-rose-100 ring-1 ring-rose-400 dark:bg-rose-950 dark:ring-rose-500"
+              >
+                <span className="flex -space-x-1">
+                  <span className="inline-block h-3.5 w-3.5 rounded-full border-[2px] border-rose-600 bg-transparent dark:border-rose-300" />
+                  <span className="inline-block h-3.5 w-3.5 rounded-full border-[2px] border-rose-600 bg-transparent dark:border-rose-300" />
+                </span>
+              </span>
+              <p className="flex-1 leading-snug text-stone-700 dark:text-stone-200">{t('tree.ringsTip')}</p>
+              <button
+                type="button"
+                className="icon-btn !h-8 !w-8 shrink-0"
+                onClick={dismissRingsTip}
+                aria-label={t('common.close')}
+              >
+                <X className="h-4 w-4" aria-hidden />
+              </button>
+            </div>
+          </div>
         </Panel>
       )}
       <Panel position="top-right" className="!m-1.5 hidden gap-1 sm:!m-3 sm:flex sm:flex-col">

@@ -26,6 +26,8 @@ export const STORAGE_KEYS = {
   treeSpacing: 'shajira.treeSpacing.v1',
   // Dismissed the one-time "how to use the tree" tip.
   treeTipSeen: 'shajira.treeTipSeen.v1',
+  // Dismissed the one-time “tap the wedding rings” tip on the tree.
+  treeRingsTipSeen: 'shajira.treeRingsTipSeen.v1',
   // First-visit welcome tour completed.
   tourSeen: 'shajira.tourSeen.v1',
   // Dismissed invite banner for this browser session key.
