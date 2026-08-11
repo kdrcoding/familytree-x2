@@ -12,11 +12,14 @@ jobs:
     steps:
       - name: Trigger birthday-telegram
         env:
-          SUPABASE_URL: ${{ secrets.SHAJIRA_SUPABASE_URL }}
+          # Public project URL (same as keepalive / the live site).
+          SUPABASE_URL: 'https://vwziwqqscpaqvudxdafw.supabase.co'
           CRON_SECRET: ${{ secrets.SHAJIRA_TELEGRAM_CRON_SECRET }}
         run: |
-          if [ -z "$SUPABASE_URL" ] || [ -z "$CRON_SECRET" ]; then
-            echo "Missing SHAJIRA_SUPABASE_URL or SHAJIRA_TELEGRAM_CRON_SECRET"
+          if [ -z "$CRON_SECRET" ]; then
+            echo "Missing SHAJIRA_TELEGRAM_CRON_SECRET"
+            echo "Set it under Settings → Secrets and variables → Actions"
+            echo "(same value as Supabase Edge secret TELEGRAM_CRON_SECRET)."
             exit 1
           fi
           curl -fsS -X POST "$SUPABASE_URL/functions/v1/birthday-telegram" \

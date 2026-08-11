@@ -19,6 +19,7 @@ Project → **Edge Functions** → Secrets (or CLI):
 ```bash
 supabase secrets set TELEGRAM_BOT_TOKEN="123456:ABC..."
 supabase secrets set TELEGRAM_WEBHOOK_SECRET="pick-a-long-random-string"
+supabase secrets set TELEGRAM_CRON_SECRET="pick-another-long-random-string"
 # Already present for other functions — reuse:
 # SUPABASE_SERVICE_ROLE_KEY / SUPABASE_URL are injected automatically on hosted Edge Functions
 ```
@@ -27,6 +28,7 @@ Also set (Dashboard → Project Settings → Edge Functions → Secrets) if not 
 
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_WEBHOOK_SECRET` — any long random string; Telegram will send it as `X-Telegram-Bot-Api-Secret-Token`
+- `TELEGRAM_CRON_SECRET` — same value as GitHub Action secret `SHAJIRA_TELEGRAM_CRON_SECRET`
 
 ## 3. Run the SQL migration
 
@@ -77,6 +79,14 @@ select cron.schedule(
 
 If `pg_net` / storing the service role in DB is awkward on free tier, use a
 **GitHub Action** instead (see `.github/workflows/birthday-telegram.yml`).
+
+GitHub → repo **Settings → Secrets and variables → Actions**:
+
+| Secret | Value |
+| --- | --- |
+| `SHAJIRA_TELEGRAM_CRON_SECRET` | Same as Supabase `TELEGRAM_CRON_SECRET` |
+
+The workflow already uses the public Supabase URL for this project.
 
 ## 6. In the app (owner)
 
