@@ -3,9 +3,3 @@ project_id = "shajira-familytree"
 
 [api]
 enabled = true
-
-[functions.telegram-webhook]
-verify_jwt = false
-
-[functions.birthday-telegram]
-verify_jwt = false

@@ -39,7 +39,6 @@ import { normalizeCountry } from '../utils/countries';
 import { downscalePhoto } from '../utils/image';
 import { ToggleSwitch } from '../components/ui/ToggleSwitch';
 import { UnlockModal } from '../components/UnlockModal';
-import { TelegramBirthdaysCard } from '../components/TelegramBirthdaysCard';
 
 /** Translated label for a changed field in the change log. */
 const FIELD_LABEL_KEYS: Record<string, TKey> = {
@@ -768,7 +767,6 @@ export function SettingsPage() {
         </div>
       </section>
 
-      <TelegramBirthdaysCard />
       <ChangeLogCard />
       <BackupsCard />
       <PhotosCard />

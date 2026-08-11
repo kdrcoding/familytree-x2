@@ -37,11 +37,6 @@ hosted on **Vercel**, data on a **separate Supabase** project.
 
 Free plan tip: Supabase usually allows **2 free projects**. You already use one for Oq-Ariq — this is the second.
 
-### Telegram birthday bot (optional)
-
-Posts Happy Birthday in a family Telegram group at a local hour (age + card image),
-and DMs linked people. Setup: [docs/TELEGRAM_BOT.md](docs/TELEGRAM_BOT.md).
-
 ### 2. GitHub + Vercel
 
 ```bash
